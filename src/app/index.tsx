@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.container}>
 
-        {/* App logo at the top */}
+      // logo 
         <View style={styles.logoWrap}>
           <Image
             source={require('./medetect_logo.png')}
@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
 
       </View>
 
-      {/* Button to begin the next step */}
+    
       <View style={styles.btnWrap}>
 
         <TouchableOpacity
@@ -96,7 +96,7 @@ export default function WelcomeScreen() {
 }
 
 
-// Screen styles (layout, spacing, and typography)
+// Screen styles 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
