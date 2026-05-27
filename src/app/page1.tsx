@@ -10,7 +10,6 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  TextInput,
   Platform,
   Dimensions,
 } from 'react-native';
@@ -18,18 +17,18 @@ import {
 
 const { width: SW } = Dimensions.get('window');
 
-// ─── Design Tokens (match PDF) ─────────────────────────────────────────────
+
 const C = {
   primary:   '#1A3F8B',
   white:     '#FFFFFF',
   grey:      '#6B7280',
   text:      '#0D1B2A',
-  border:    '#0D1B2A',   // unselected chip border — matches PDF (dark border)
+  border:    '#0D1B2A',  
   navBg:     '#1A3F8B',
   trackBg:   '#D1D5DB',
 };
 
-// ─── Add / remove symptoms here freely ───────────────────────────────────────
+
 const ALL_SYMPTOMS = [
   'ABDOMINAL BLOATING',
   'ABDOMINAL PAIN',
@@ -331,7 +330,10 @@ export default function SymptomSelectScreen({ onContinue, onNavigate }: { onCont
             styles.continueBtn,
             selected.length === 0 && styles.continueBtnDisabled,
           ]}
-          onPress={() => selected.length > 0 && onContinue?.(selected)}
+          onPress={() => {
+            if (selected.length === 0) return;
+            onContinue?.(selected);
+          }}
           activeOpacity={0.85}
         >
           <Text style={styles.continueBtnText}>Continue  →</Text>
