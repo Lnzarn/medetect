@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.container}>
 
-        {/* ── Logo ── */}
+        {/* App logo at the top */}
         <View style={styles.logoWrap}>
           <Image
             source={require('./medetect_logo.png')}
@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
 
       </View>
 
-      {/* ── Start Session button ── */}
+      {/* Button to begin the next step */}
       <View style={styles.btnWrap}>
 
         <TouchableOpacity
@@ -81,7 +81,7 @@ export default function WelcomeScreen() {
 
         >
 
-          {/* Play-icon badge */}
+          {/* Small play/arrow icon */}
           <View>
             <Text style={styles.playIcon}>▶</Text>
           </View>
@@ -96,7 +96,7 @@ export default function WelcomeScreen() {
 }
 
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
+// Screen styles (layout, spacing, and typography)
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
-  // ── Logo ────────────────────────────────────────────────────────────────────
+  // Logo
   logoWrap: {
     marginBottom: 4,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '40deg' }],
   },
 
-  // ── Brand name ──────────────────────────────────────────────────────────────
+  // Brand name
   brandText: {
     fontSize: 38,
     letterSpacing: 1,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
 
 
-  // ── Tagline ─────────────────────────────────────────────────────────────────
+  // Tagline
   taglineBlock: {
     alignItems: 'center',
   },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 
-  // ── Button ──────────────────────────────────────────────────────────────────
+  // Button
   btnWrap: {
     paddingHorizontal: 32,
     paddingBottom: Platform.OS === 'ios' ? 24 : 32,
