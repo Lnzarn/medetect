@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.container}>
 
-      // logo 
+    
         <View style={styles.logoWrap}>
           <Image
             source={require('./medetect_logo.png')}
@@ -81,7 +81,7 @@ export default function WelcomeScreen() {
 
         >
 
-          {/* Small play/arrow icon */}
+          
           <View>
             <Text style={styles.playIcon}>▶</Text>
           </View>
@@ -96,7 +96,7 @@ export default function WelcomeScreen() {
 }
 
 
-// Screen styles 
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     height: 180,
   },
 
-  // ECG / heartbeat line
+ 
   ecgRow: {
     position: 'absolute',
     flexDirection: 'row',
