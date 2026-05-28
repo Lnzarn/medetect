@@ -17,10 +17,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log('Login pressed', { email, password });
-    
-  };
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -56,7 +53,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.bottomContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.button} onPress={() => {}} activeOpacity={0.8}>
               <Text style={styles.buttonText}>Log In</Text>
             </TouchableOpacity>
 
