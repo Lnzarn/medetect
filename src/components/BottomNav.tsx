@@ -1,94 +1,99 @@
 import React from "react";
-import {
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import Colors from "../constants/colors";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface BottomNavProps {
-  onNavigate?: (key: string) => void;
-}
+// Assuming these paths are correct relative to where you saved the code originally.
+// If this file is in a different folder now, adjust these imports!
+import profileIco from "../icons/profile.png";
+import calendarIco from "../icons/calendar.png";
+import addIco from "../icons/add.png";
+import navigationIco from "../icons/navigation.png";
+import settingsIco from "../icons/settings.png";
 
-const TABS = [
-  { key: "profile", icon: "🪪" },
-  { key: "calendar", icon: "📅" },
-  { key: "add", icon: "📋", center: true },
-  { key: "navigation", icon: "➤" },
-  { key: "settings", icon: "⚙️" },
-];
+export default function BottomNav({ onNavigate }: { onNavigate?: (key: string) => void }) {
+  const insets = useSafeAreaInsets();
+  
+  const tabs = [
+    { key: "profile", icon: profileIco },
+    { key: "calendar", icon: calendarIco },
+    { key: "add", icon: addIco, center: true },
+    { key: "navigation", icon: navigationIco },
+    { key: "settings", icon: settingsIco },
+  ];
 
-export default function BottomNav({ onNavigate }: BottomNavProps) {
   return (
-    <View style={styles.navBar}>
-      {TABS.map((tab) =>
-        tab.center ? (
-          <View key={tab.key} style={styles.navItemCenter}>
+    <View style={[styles.bottomNavContainer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      <View style={styles.bottomNavBar}>
+        {tabs.map((tab) =>
+          tab.center ? (
+            <View key={tab.key} style={styles.bottomNavItemCenter}>
+              <TouchableOpacity
+                style={styles.bottomNavCenterBtn}
+                onPress={() => onNavigate?.(tab.key)}
+                activeOpacity={0.8}
+              >
+                <Image source={tab.icon} style={styles.bottomNavCenterIconImg} />
+                <View style={styles.bottomNavPlusBadge}>
+                  <Text style={styles.bottomNavPlusText}>+</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ) : (
             <TouchableOpacity
-              style={styles.navCenterBtn}
+              key={tab.key}
+              style={styles.bottomNavItem}
               onPress={() => onNavigate?.(tab.key)}
-              activeOpacity={0.8}
+              activeOpacity={0.7}
             >
-              <Text style={styles.navCenterIcon}>📋</Text>
-              <View style={styles.navPlusBadge}>
-                <Text style={styles.navPlusText}>+</Text>
-              </View>
+               <Image source={tab.icon} style={styles.bottomNavIconImg} />
             </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity
-            key={tab.key}
-            style={styles.navItem}
-            onPress={() => onNavigate?.(tab.key)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.navIcon}>{tab.icon}</Text>
-          </TouchableOpacity>
-        ),
-      )}
+          )
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  navBar: {
-    height: 70,
-    backgroundColor: Colors.navBg,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+  bottomNavContainer: {
+    backgroundColor: "#1A3F8B",
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
-    paddingBottom: Platform.OS === "ios" ? 8 : 0,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 12,
   },
-  navItem: {
+  bottomNavBar: {
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  bottomNavItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
   },
-  navIcon: {
-    fontSize: 20,
-    color: Colors.white,
+  bottomNavIconImg: {
+    width: 22,
+    height: 22,
+    resizeMode: "contain",
+    tintColor: "#FFFFFF" 
   },
-  navItemCenter: {
+  bottomNavItemCenter: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -26,
+    marginTop: -32,
   },
-  navCenterBtn: {
+  bottomNavCenterBtn: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: Colors.white,
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -97,23 +102,25 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 6,
   },
-  navCenterIcon: {
-    fontSize: 22,
+  bottomNavCenterIconImg: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
-  navPlusBadge: {
+  bottomNavPlusBadge: {
     position: "absolute",
     bottom: 5,
     right: 5,
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: Colors.primary,
+    backgroundColor: "#1A3F8B",
     alignItems: "center",
     justifyContent: "center",
   },
-  navPlusText: {
+  bottomNavPlusText: {
     fontSize: 11,
-    color: Colors.white,
+    color: "#FFFFFF",
     fontWeight: "900",
     lineHeight: 14,
   },
