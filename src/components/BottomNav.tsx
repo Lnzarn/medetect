@@ -1,51 +1,116 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
-// Assuming these paths are correct relative to where you saved the code originally.
-// If this file is in a different folder now, adjust these imports!
 import profileIco from "../icons/profile.png";
 import calendarIco from "../icons/calendar.png";
 import addIco from "../icons/add.png";
 import navigationIco from "../icons/navigation.png";
 import settingsIco from "../icons/settings.png";
 
-export default function BottomNav({ onNavigate }: { onNavigate?: (key: string) => void }) {
+export default function BottomNav() {
   const insets = useSafeAreaInsets();
-  
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState("calendar");
+
   const tabs = [
-    { key: "profile", icon: profileIco },
-    { key: "calendar", icon: calendarIco },
-    { key: "add", icon: addIco, center: true },
-    { key: "navigation", icon: navigationIco },
-    { key: "settings", icon: settingsIco },
+    { key: "profile", label: "Profile", icon: profileIco },
+    { key: "calendar", label: "Pill Schedule", icon: calendarIco },
+    { key: "add",label: "Consult", icon: addIco, center: true },
+    { key: "navigation", label: "Map", icon: navigationIco },
+    { key: "settings", label: "Settings", icon: settingsIco },
   ];
 
+  const handleTabPress = (key: string) => {
+    setActiveTab(key);
+
+    switch (key) {
+      case "profile":
+        router.push("/AccountPage");
+        break;
+
+      case "calendar":
+        router.push("/pill_sched");
+        break;
+
+      case "add":
+        console.log("Add button pressed");
+        break;
+
+      case "navigation":
+        // router.push("/MapPage");
+        break;
+
+      case "settings":
+        router.push("/Settings");
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return (
-    <View style={[styles.bottomNavContainer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View
+      style={[
+        styles.bottomNavContainer,
+        { paddingBottom: Math.max(insets.bottom, 8) },
+      ]}
+    >
       <View style={styles.bottomNavBar}>
         {tabs.map((tab) =>
           tab.center ? (
-            <View key={tab.key} style={styles.bottomNavItemCenter}>
+            <View key={tab.key} style={styles.centerContainer}>
               <TouchableOpacity
-                style={styles.bottomNavCenterBtn}
-                onPress={() => onNavigate?.(tab.key)}
-                activeOpacity={0.8}
+                style={styles.fabButton}
+                onPress={() => handleTabPress(tab.key)}
+                activeOpacity={0.85}
               >
-                <Image source={tab.icon} style={styles.bottomNavCenterIconImg} />
-                <View style={styles.bottomNavPlusBadge}>
-                  <Text style={styles.bottomNavPlusText}>+</Text>
-                </View>
+                <Image source={tab.icon} style={styles.fabIcon} />
               </TouchableOpacity>
+
+              <Text style={[styles.centerLabel, activeTab === tab.key && styles.centerActiveLabel]}>
+                {tab.label}
+              </Text>
             </View>
           ) : (
             <TouchableOpacity
               key={tab.key}
-              style={styles.bottomNavItem}
-              onPress={() => onNavigate?.(tab.key)}
+              style={styles.navItem}
+              onPress={() => handleTabPress(tab.key)}
               activeOpacity={0.7}
             >
-               <Image source={tab.icon} style={styles.bottomNavIconImg} />
+              <View
+                style={[
+                  styles.iconContainer,
+                  activeTab === tab.key && styles.activeIconContainer,
+                ]}
+              >
+                <Image
+                  source={tab.icon}
+                  style={[
+                    styles.navIcon,
+                    activeTab === tab.key && styles.activeNavIcon,
+                  ]}
+                />
+              </View>
+
+              <Text
+                style={[
+                  styles.label,
+                  activeTab === tab.key && styles.activeLabel,
+                ]}
+              >
+                {tab.label}
+              </Text>
             </TouchableOpacity>
           )
         )}
@@ -57,71 +122,111 @@ export default function BottomNav({ onNavigate }: { onNavigate?: (key: string) =
 const styles = StyleSheet.create({
   bottomNavContainer: {
     backgroundColor: "#1A3F8B",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
     elevation: 12,
   },
+
   bottomNavBar: {
-    height: 60,
+    height: 78,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
   },
-  bottomNavItem: {
+
+  navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
   },
-  bottomNavIconImg: {
+
+  iconContainer: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+
+  activeIconContainer: {
+    backgroundColor: "rgba(255,255,255,0.15)",
+  },
+
+  navIcon: {
     width: 22,
     height: 22,
     resizeMode: "contain",
-    tintColor: "#FFFFFF" 
+    tintColor: "#FFFFFF",
   },
-  bottomNavItemCenter: {
+
+  activeNavIcon: {
+    tintColor: "#FFFFFF",
+  },
+
+  label: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "rgba(255,255,255,0.75)",
+    fontWeight: "500",
+  },
+
+  activeLabel: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+
+  centerContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -32,
+    marginTop: -38,
   },
-  bottomNavCenterBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+
+  fabButton: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+
     backgroundColor: "#FFFFFF",
+
     alignItems: "center",
     justifyContent: "center",
+
+    borderWidth: 4,
+    borderColor: "#1A3F8B",
+
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 5,
-    elevation: 6,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
   },
-  bottomNavCenterIconImg: {
-    width: 40,
-    height: 40,
+
+  fabIcon: {
+    width: 38,
+    height: 38,
     resizeMode: "contain",
   },
-  bottomNavPlusBadge: {
-    position: "absolute",
-    bottom: 5,
-    right: 5,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: "#1A3F8B",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bottomNavPlusText: {
+
+  centerLabel: {
+    marginTop: 2,
     fontSize: 11,
+    color: "rgba(255,255,255,0.75)",
+    fontWeight: "500",
+  },
+
+  centerActiveLabel: {
     color: "#FFFFFF",
-    fontWeight: "900",
-    lineHeight: 14,
+    fontWeight: "700",
   },
 });
