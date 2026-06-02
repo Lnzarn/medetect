@@ -42,7 +42,7 @@ export default function BottomNav() {
         break;
 
       case "add":
-        console.log("Add button pressed");
+        router.push("/page1");
         break;
 
       case "navigation":
