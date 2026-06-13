@@ -1,7 +1,8 @@
-import { getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
+import { forceSync, getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
+  Button,
   Dimensions,
   Image,
   Platform,
@@ -76,6 +77,7 @@ export default function WelcomeScreen() {
           <Text style={styles.playIcon}>▶</Text>
           <Text style={styles.startBtnText}>Log In</Text>
         </TouchableOpacity>
+        <Button onPress={() => forceSync()} title="Sync" />
       </View>
     </SafeAreaView>
   );

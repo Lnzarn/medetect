@@ -12,6 +12,7 @@ interface ProbRow {
 
 export async function syncDiseaseData(force = false): Promise<void> {
   const db = await getDB();
+
   if (!force) {
     const meta = await db.getFirstAsync<{ value: string }>(
       `SELECT value FROM sync_meta WHERE key = ?`,
@@ -30,27 +31,20 @@ export async function syncDiseaseData(force = false): Promise<void> {
   }
 
   console.log("Fetching disease data from Supabase...");
-  const { data, error } = await supabase
-    .from("disease_symptom_probs")
-    .select("disease, symptom, probability")
-    .range(0, 9999);
 
-  if (error) {
-    console.error("Supabase fetch failed:", error.message);
-    throw error;
-  }
+  const data = await fetchAllRows();
 
-  if (!data || data.length === 0) {
+  if (data.length === 0) {
     console.warn("No data returned from Supabase");
     return;
   }
 
-  console.log(`Fetched ${data.length} rows - writing to SQLite...`);
+  console.log(`Writing ${data.length} rows to SQLite...`);
 
   await db.withTransactionAsync(async () => {
     await db.runAsync(`DELETE FROM disease_symptom_probs`);
 
-    for (const row of data as ProbRow[]) {
+    for (const row of data) {
       await db.runAsync(
         `INSERT INTO disease_symptom_probs (disease, symptom, probability)
          VALUES (?, ?, ?)`,
@@ -68,6 +62,43 @@ export async function syncDiseaseData(force = false): Promise<void> {
   });
 
   console.log(`Done - ${data.length} rows saved to SQLite`);
+}
+
+async function fetchAllRows(): Promise<ProbRow[]> {
+  const PAGE_SIZE = 1000;
+  let allRows: ProbRow[] = [];
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("disease_symptom_probs")
+      .select("disease, symptom, probability")
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+
+    allRows = [...allRows, ...(data as ProbRow[])];
+    hasMore = data.length === PAGE_SIZE;
+    from += PAGE_SIZE;
+  }
+
+  console.log(`Total fetched: ${allRows.length} rows`);
+  return allRows;
+}
+
+export async function getLastSynced(): Promise<string | null> {
+  const db = await getDB();
+  const meta = await db.getFirstAsync<{ value: string }>(
+    `SELECT value FROM sync_meta WHERE key = ?`,
+    SYNC_KEY,
+  );
+  return meta?.value ?? null;
+}
+
+export async function forceSync(): Promise<void> {
+  return syncDiseaseData(true); // force = true skips the 24hr check
 }
 
 export async function getSymptomsForDisease(
