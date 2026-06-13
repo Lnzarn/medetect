@@ -38,7 +38,7 @@ export default function AccountScreen() {
             <Text style={sharedStyles.label}>Username</Text>
             <TextInput
               style={sharedStyles.input}
-              placeholder="furryfemboy123"
+              placeholder="username123"
               placeholderTextColor="#9CA3AF"
               value={username}
               onChangeText={setUsername}
@@ -62,12 +62,12 @@ export default function AccountScreen() {
   );
 }
 
-// Only page-specific overrides live here
+
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 80, // slightly different from auth pages
+    paddingTop: 80, 
     paddingBottom: 80,
   },
 });
