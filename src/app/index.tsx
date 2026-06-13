@@ -1,5 +1,6 @@
+import { getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dimensions,
   Image,
@@ -17,7 +18,16 @@ const { width: SW } = Dimensions.get("window");
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  useEffect(() => {
+    async function testSync() {
+      const diseases = await getAllDiseases();
+      console.log("Diseases in SQLite:", diseases.length);
 
+      const symptoms = await getSymptomsForDisease("Dengue");
+      console.log("Dengue symptoms:", symptoms.slice(0, 5));
+    }
+    testSync();
+  }, []);
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
