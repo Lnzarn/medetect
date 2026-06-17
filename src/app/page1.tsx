@@ -130,6 +130,8 @@ export default function SymptomSelectScreen({
           style={[styles.continueBtn, selected.length === 0 && styles.continueBtnDisabled]}
           onPress={() => {
             if (selected.length === 0) return;
+            const encoded = encodeURIComponent(JSON.stringify(selected));
+            router.push(`/results?selected=${encoded}`);
             onContinue?.(selected);
           }}
           activeOpacity={0.85}
