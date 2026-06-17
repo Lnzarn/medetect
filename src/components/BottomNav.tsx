@@ -25,7 +25,6 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
 
   const [activeTab, setActiveTab] = useState("calendar");
 
-
   const tabs = [
     { key: "profile", label: "Profile", icon: profileIco },
     { key: "calendar", label: "Pill Schedule", icon: calendarIco },
@@ -52,7 +51,7 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
         break;
 
       case "navigation":
-        // router.push("/MapPage");
+        router.push("/map");
         break;
 
       case "settings":

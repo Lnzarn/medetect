@@ -37,6 +37,33 @@ export default function RootLayout() {
         name="results"
         options={{ headerShown: false, animation: "slide_from_right" }}
       />
+
+      {/* map page for finding nearby hospitals */}
+      <Stack.Screen
+        name="map"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
+
+      {/* Other screens */}
+      <Stack.Screen
+        name="LogInPage"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
+
+      <Stack.Screen
+        name="SignUpPage"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
+
+      <Stack.Screen
+        name="AccountPage"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
+
+      <Stack.Screen
+        name="Settings"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
     </Stack>
   );
 }
