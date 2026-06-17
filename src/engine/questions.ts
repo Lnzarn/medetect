@@ -180,3 +180,10 @@ export const SYMPTOM_QUESTIONS: Record<string, string> = {
     "Are you experiencing confusion or trouble thinking clearly?",
   Pain_During_Urination: "Do you feel pain during urination?",
 };
+
+export function getQuestion(symptom: string): string {
+  return (
+    SYMPTOM_QUESTIONS[symptom] ??
+    `Are you experiencing ${symptom.replace(/_/g, " ").toLowerCase()}?`
+  );
+}

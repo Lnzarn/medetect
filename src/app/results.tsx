@@ -1,5 +1,5 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -8,283 +8,318 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
-import BottomNav from '../components/BottomNav';
-import StepBar from '../components/StepBar';
-import Colors from '../constants/colors';
-import { getAllDiseaseSymptoms } from '../lib/sync';
+} from "react-native";
+import BottomNav from "../components/BottomNav";
+import StepBar from "../components/StepBar";
+import Colors from "../constants/colors";
+import { AssessmentResult, DiseaseScore } from "../engine/types";
 
-interface DiseaseMatch {
-    disease: string;
-    matchPercentage: number;
-    description: string;
+const SEVERITY_LABELS: Record<string, { label: string; color: string }> = {
+  low: { label: "Mild — Monitor at home", color: "#10B981" },
+  moderate: { label: "Moderate — Consider seeing a doctor", color: "#F59E0B" },
+  high: { label: "Serious — See a doctor soon", color: "#EF4444" },
+  emergency: { label: "🚨 Emergency — Seek help now", color: "#DC2626" },
+};
+
+function getSeverity(confidence: number, isEmergency: boolean) {
+  if (isEmergency) return SEVERITY_LABELS.emergency;
+  if (confidence >= 0.8) return SEVERITY_LABELS.high;
+  if (confidence >= 0.6) return SEVERITY_LABELS.moderate;
+  return SEVERITY_LABELS.low;
 }
 
-export default function ResultsPage() {
-    const router = useRouter();
-    const params = useLocalSearchParams();
-    const [conditions, setConditions] = useState<DiseaseMatch[]>([]);
-    const [loading, setLoading] = useState(true);
+function getStoppedReasonText(reason: AssessmentResult["stoppedReason"]) {
+  switch (reason) {
+    case "threshold_met":
+      return "A confident match was found.";
+    case "max_questions":
+      return "Maximum questions reached.";
+    case "no_more_questions":
+      return "All relevant questions were asked.";
+  }
+}
 
-    const selected = React.useMemo(() => {
-        if (!params.selected) return [] as string[];
-        try {
-            return JSON.parse(decodeURIComponent(params.selected as string)) as string[];
-        } catch {
-            return [] as string[];
-        }
-    }, [params.selected]);
+export default function ResultsScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
-    useEffect(() => {
-        const fetchMatchingDiseases = async () => {
-            try {
-                const diseaseSymptoms = await getAllDiseaseSymptoms();
+  const result = useMemo<AssessmentResult | null>(() => {
+    if (!params.result) return null;
+    try {
+      return JSON.parse(decodeURIComponent(params.result as string));
+    } catch {
+      return null;
+    }
+  }, [params.result]);
 
-                // Calculate match percentage for each disease
-                const matches: DiseaseMatch[] = [];
+  const handleBottomNav = (key: string) => {
+    if (key === "calendar") router.push("/pill_sched");
+  };
 
-                for (const disease in diseaseSymptoms) {
-                    const symptoms = diseaseSymptoms[disease];
-                    let totalProb = 0;
-                    let matchCount = 0;
-
-                    for (const symptom of selected) {
-                        if (symptoms[symptom]) {
-                            totalProb += symptoms[symptom];
-                            matchCount += 1;
-                        }
-                    }
-
-                    const matchPercentage = selected.length > 0
-                        ? Math.round((matchCount / selected.length) * 100)
-                        : 0;
-
-                    if (matchPercentage > 0) {
-                        matches.push({
-                            disease,
-                            matchPercentage,
-                            description: `Condition matching ${matchCount} of your selected symptoms.`,
-                        });
-                    }
-                }
-
-                // Sort by match percentage descending
-                matches.sort((a, b) => b.matchPercentage - a.matchPercentage);
-
-                // Take top 10 matches
-                setConditions(matches.slice(0, 10));
-            } catch (error) {
-                console.error('Error fetching diseases:', error);
-                setConditions([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (selected.length > 0) {
-            fetchMatchingDiseases();
-        } else {
-            setLoading(false);
-        }
-    }, [selected]);
-
-    const handleYesClick = () => {
-        alert('Assessment confirmed as exact match');
-    };
-
-    const handleNoneClick = () => {
-        alert('Starting new assessment');
-    };
-
-    const handleBottomNav = (key: string) => {
-        // Bottom nav handles routing
-    };
-
+  if (!result) {
     return (
-        <SafeAreaView style={styles.safe}>
-            <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-
-            <View style={styles.topSection}>
-                <StepBar step={3} total={3} />
-                <Text style={styles.title}>ASSESSMENT{'\n'}COMPLETE</Text>
-                <Text style={styles.subtitle}>Based on your selected symptoms, here are the top matches.</Text>
-            </View>
-
-            <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-                <Text style={styles.sectionTitle}>POSSIBLE CONDITIONS</Text>
-
-                {loading ? (
-                    <Text style={styles.loadingText}>Loading results...</Text>
-                ) : conditions.length === 0 ? (
-                    <Text style={styles.emptyText}>No matching conditions found.</Text>
-                ) : (
-                    conditions.map((condition) => (
-                        <View key={condition.disease} style={styles.conditionCard}>
-                            <View style={styles.cardHeader}>
-                                <Text style={styles.diseaseName}>{condition.disease}</Text>
-                                <Text style={styles.matchPercentage}>{condition.matchPercentage}% Match</Text>
-                            </View>
-                            <Text style={styles.description}>{condition.description}</Text>
-                        </View>
-                    ))
-                )}
-            </ScrollView>
-
-            <View style={styles.footer}>
-                <TouchableOpacity
-                    style={styles.yesBtn}
-                    onPress={handleYesClick}
-                    activeOpacity={0.85}
-                >
-                    <Text style={styles.yesBtnText}>Yes, this is an exact match</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.noneBtn}
-                    onPress={handleNoneClick}
-                    activeOpacity={0.85}
-                >
-                    <Text style={styles.noneBtnText}>None of these matches</Text>
-                </TouchableOpacity>
-            </View>
-
-            <BottomNav onNavigate={handleBottomNav} />
-        </SafeAreaView>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.errorWrapper}>
+          <Text style={styles.errorText}>No results found.</Text>
+          <TouchableOpacity onPress={() => router.push("/page1")}>
+            <Text style={styles.retryText}>Start Over</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
+  }
+
+  const top = result.topMatches[0];
+  const severity = getSeverity(top?.confidence ?? 0, result.isEmergency);
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+
+      <View style={styles.topSection}>
+        <StepBar step={3} total={3} />
+        <Text style={styles.title}>ASSESSMENT{"\n"}COMPLETE</Text>
+        <Text style={styles.subtitle}>
+          {getStoppedReasonText(result.stoppedReason)}{" "}
+          {result.totalQuestionsAsked} question
+          {result.totalQuestionsAsked !== 1 ? "s" : ""} asked.
+        </Text>
+      </View>
+
+      {/* Emergency Banner */}
+      {result.isEmergency && (
+        <View style={styles.emergencyBanner}>
+          <Text style={styles.emergencyText}>
+            🚨 Please seek emergency medical attention immediately.
+          </Text>
+        </View>
+      )}
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Severity indicator */}
+        <View style={[styles.severityCard, { borderColor: severity.color }]}>
+          <Text style={[styles.severityText, { color: severity.color }]}>
+            {severity.label}
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>POSSIBLE CONDITIONS</Text>
+        <Text style={styles.disclaimer}>
+          ⚠️ This is not a medical diagnosis. Always consult a healthcare
+          professional.
+        </Text>
+
+        {result.topMatches.map((match: DiseaseScore, index: number) => (
+          <View key={match.disease} style={styles.conditionCard}>
+            <View style={styles.cardHeader}>
+              <View style={styles.rankBadge}>
+                <Text style={styles.rankText}>#{index + 1}</Text>
+              </View>
+              <Text style={styles.diseaseName}>{match.disease}</Text>
+              <Text style={styles.matchPercentage}>
+                {Math.round(match.confidence * 100)}%
+              </Text>
+            </View>
+
+            {/* Confidence bar */}
+            <View style={styles.barTrack}>
+              <View
+                style={[
+                  styles.barFill,
+                  {
+                    width: `${Math.round(match.confidence * 100)}%`,
+                    backgroundColor:
+                      index === 0 ? Colors.primary : Colors.greyLight,
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      <View style={styles.footer}>
+        {/* Find clinic — show if moderate or above */}
+        {(top?.confidence ?? 0) >= 0.6 && (
+          <TouchableOpacity
+            style={styles.clinicBtn}
+            onPress={() => router.push("/map")}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.clinicBtnText}>📍 Find Nearest Clinic</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={styles.retryBtn}
+          onPress={() => router.push("/page1")}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.retryBtnText}>Start New Assessment</Text>
+        </TouchableOpacity>
+      </View>
+
+      <BottomNav onNavigate={handleBottomNav} />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    safe: { flex: 1, backgroundColor: Colors.white },
+  safe: { flex: 1, backgroundColor: Colors.white },
+  errorWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  errorText: { fontSize: 16, color: Colors.text },
+  retryText: { fontSize: 14, color: Colors.primary, fontWeight: "700" },
 
-    topSection: {
-        paddingHorizontal: 22,
-        paddingTop: 10,
-        paddingBottom: 16,
-        backgroundColor: Colors.white,
-    },
+  topSection: {
+    paddingHorizontal: 22,
+    paddingTop: 10,
+    paddingBottom: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: Colors.text,
+    lineHeight: 34,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: Colors.text,
+    lineHeight: 18,
+  },
 
-    title: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: Colors.text,
-        lineHeight: 34,
-        marginTop: 12,
-        marginBottom: 8,
-    },
+  emergencyBanner: {
+    marginHorizontal: 22,
+    backgroundColor: "#FEE2E2",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 4,
+  },
+  emergencyText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#DC2626",
+    textAlign: "center",
+  },
 
-    subtitle: {
-        fontSize: 14,
-        color: Colors.text,
-        lineHeight: 20,
-    },
+  scroll: { flex: 1 },
+  scrollContent: {
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
 
-    content: {
-        flex: 1,
-        backgroundColor: Colors.white,
-    },
+  severityCard: {
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  severityText: {
+    fontSize: 15,
+    fontWeight: "800",
+  },
 
-    contentContainer: {
-        paddingHorizontal: 22,
-        paddingTop: 12,
-        paddingBottom: 16,
-    },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  disclaimer: {
+    fontSize: 12,
+    color: "#6B7280",
+    lineHeight: 17,
+    marginBottom: 14,
+  },
 
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '900',
-        color: Colors.text,
-        marginBottom: 16,
-    },
+  conditionCard: {
+    borderWidth: 2,
+    borderColor: Colors.greyLight,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    gap: 10,
+  },
+  rankBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rankText: { fontSize: 12, fontWeight: "900", color: Colors.white },
+  diseaseName: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "900",
+    color: Colors.text,
+  },
+  matchPercentage: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: Colors.primary,
+  },
+  barTrack: {
+    height: 6,
+    backgroundColor: "#F3F4F6",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  barFill: {
+    height: 6,
+    borderRadius: 3,
+  },
 
-    conditionCard: {
-        backgroundColor: Colors.white,
-        borderWidth: 2,
-        borderColor: Colors.greyLight,
-        borderRadius: 16,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        marginBottom: 12,
-    },
-
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-
-    diseaseName: {
-        fontSize: 16,
-        fontWeight: '900',
-        color: Colors.text,
-    },
-
-    matchPercentage: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: Colors.primary,
-    },
-
-    description: {
-        fontSize: 13,
-        color: Colors.text,
-        lineHeight: 18,
-    },
-
-    footer: {
-        paddingHorizontal: 22,
-        paddingTop: 10,
-        paddingBottom: 10,
-        backgroundColor: Colors.white,
-        gap: 10,
-    },
-
-    yesBtn: {
-        backgroundColor: Colors.primary,
-        borderRadius: 14,
-        paddingVertical: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: Colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.28,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-
-    yesBtnText: {
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: '800',
-        letterSpacing: 0.3,
-    },
-
-    noneBtn: {
-        backgroundColor: '#6B7280',
-        borderRadius: 14,
-        paddingVertical: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    noneBtnText: {
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: '800',
-        letterSpacing: 0.3,
-    },
-
-    loadingText: {
-        fontSize: 14,
-        color: Colors.text,
-        textAlign: 'center',
-        marginTop: 20,
-    },
-
-    emptyText: {
-        fontSize: 14,
-        color: Colors.text,
-        lineHeight: 20,
-        textAlign: 'center',
-        marginTop: 20,
-    },
+  footer: {
+    paddingHorizontal: 22,
+    paddingTop: 10,
+    paddingBottom: 10,
+    gap: 10,
+  },
+  clinicBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  clinicBtnText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  retryBtn: {
+    backgroundColor: "#6B7280",
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  retryBtnText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: "800",
+  },
 });

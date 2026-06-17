@@ -3,10 +3,12 @@ export type ClusterKey =
   | "respiratory"
   | "skin"
   | "eyes"
+  | "ears"
   | "digestive"
-  | "pain_mobility"
+  | "pain"
+  | "bone_joint"
   | "cardiovascular"
-  | "urinary"
+  | "urinary_rectal"
   | "general";
 
 export interface Cluster {
@@ -40,6 +42,11 @@ export const CLUSTERS: Cluster[] = [
     ],
   },
   {
+    key: "digestive",
+    label: "Digestive",
+    diseases: ["GERD", "Hepatitis A", "Constipation", "Gastroenteritis"],
+  },
+  {
     key: "skin",
     label: "Skin",
     diseases: [
@@ -55,27 +62,27 @@ export const CLUSTERS: Cluster[] = [
   {
     key: "eyes",
     label: "Eyes",
-    diseases: ["Conjunctivitis", "Trachoma", "Measles"],
+    diseases: ["Conjunctivitis", "Trachoma"],
   },
   {
-    key: "digestive",
-    label: "Digestive",
-    diseases: ["GERD", "Hepatitis A", "Jaundice", "Constipation"],
+    key: "ears",
+    label: "Ear Problems",
+    diseases: ["Otitis Media"],
   },
   {
-    key: "pain_mobility",
-    label: "Pain & Mobility",
-    diseases: ["Osteoarthritis", "Migraine", "Dengue", "Malaria", "Arthritis"],
+    key: "pain",
+    label: "Pain & Headache",
+    diseases: ["Migraine", "Dengue", "Malaria"],
   },
   {
-    key: "cardiovascular",
-    label: "Heart & Blood Pressure",
-    diseases: ["Hypertension"],
+    key: "urinary_rectal",
+    label: "Urinary & Rectal",
+    diseases: ["Urinary Tract Infection", "Dimorphic Hemorrhoids (Piles)"],
   },
   {
-    key: "urinary",
-    label: "Urinary",
-    diseases: ["Urinary Tract Infection"],
+    key: "bone_joint",
+    label: "Bone & Joint",
+    diseases: ["Osteoarthritis"],
   },
   {
     key: "general",

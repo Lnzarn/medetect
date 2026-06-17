@@ -1,6 +1,7 @@
+import Loading from "@/components/Loading";
 import { forceSync, getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dimensions,
@@ -18,7 +19,9 @@ import Colors from "../constants/colors";
 const { width: SW } = Dimensions.get("window");
 
 export default function WelcomeScreen() {
+  const [syncing, setSyncing] = useState(false);
   const router = useRouter();
+
   useEffect(() => {
     async function testSync() {
       const diseases = await getAllDiseases();
@@ -29,6 +32,23 @@ export default function WelcomeScreen() {
     }
     testSync();
   }, []);
+
+  const handleSync = async () => {
+    if (syncing) return;
+
+    try {
+      setSyncing(true);
+
+      console.log("Starting sync...");
+      await forceSync();
+
+      console.log("Sync complete.");
+    } catch (error) {
+      console.error("Sync failed:", error);
+    } finally {
+      setSyncing(false);
+    }
+  };
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
@@ -77,8 +97,18 @@ export default function WelcomeScreen() {
           <Text style={styles.playIcon}>▶</Text>
           <Text style={styles.startBtnText}>Log In</Text>
         </TouchableOpacity>
-        <Button onPress={() => forceSync()} title="Sync" />
+        <Button
+          title={syncing ? "Syncing.." : "Sync"}
+          onPress={handleSync}
+          disabled={syncing}
+        />
       </View>
+
+      {syncing && (
+        <View style={styles.loadingOverlay}>
+          <Loading message="Updating disease database..." />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -150,5 +180,16 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: 0.4,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255,255,255,0.99)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
   },
 });

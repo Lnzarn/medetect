@@ -1,5 +1,8 @@
+// engine/scorer.ts
+
 import { DiseaseScore } from "./types";
-const CONFIDENCE_THRESHOLD = 0.6;
+
+const CONFIDENCE_THRESHOLD = 0.75;
 
 export function scoreAllDiseases(
   allDiseaseSymptoms: Record<string, Record<string, number>>,
@@ -17,8 +20,12 @@ export function scoreAllDiseases(
       if (answer === 1) {
         logScore += Math.log(p);
       } else if (answer === -1) {
-        logScore += Math.log(1 - p);
+        // Amplify penalty for denying a highly probable symptom
+        const penalty = Math.log(1 - p);
+        const weight = 1 + p; // 1.0–2.0, higher p = heavier penalty
+        logScore += penalty * weight;
       }
+      // answer === 0 (not sure) contributes nothing
     }
 
     rawScores.push({ disease, score: logScore });
@@ -48,7 +55,7 @@ export function shouldStop(
   const second = rankings[1];
 
   const meetsThreshold = top.confidence >= threshold;
-  const hasGap = !second || top.confidence - second.confidence >= 0.1;
+  const hasGap = !second || top.confidence - second.confidence >= 0.2;
 
   return meetsThreshold && hasGap;
 }

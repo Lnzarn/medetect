@@ -1,10 +1,14 @@
+// engine/session.ts
+
 import { getAllDiseaseSymptoms } from "@/lib/sync";
 import { ClusterKey, getCluster } from "./clusters";
 import { getClusterPrioritySymptoms, pickNextQuestion } from "./questionPicker";
 import { scoreAllDiseases, shouldStop } from "./scorer";
 import { Answer, AssessmentResult, SessionState } from "./types";
 
-const MAX_QUESTIONS = 20;
+const MAX_QUESTIONS = 15;
+const MIN_QUESTIONS_BEFORE_STOP = 8; // must complete full seed phase first
+
 const EMERGENCY_SYMPTOMS = [
   "Chest_Pain",
   "Loss_of_Consciousness",
@@ -88,7 +92,7 @@ export async function processAnswer(
   const newAsked = [...state.askedSymptoms, symptom];
   const newCount = state.questionCount + 1;
 
-  // 2. Emergency check
+  // 2. Emergency check — always runs regardless of question count
   if (answer === 1 && EMERGENCY_SYMPTOMS.includes(symptom)) {
     const rankings = scoreAllDiseases(allDiseaseSymptoms, newAnswers);
     const result: AssessmentResult = {
@@ -111,21 +115,25 @@ export async function processAnswer(
     };
   }
 
-  // 3. Re-score all diseases
+  // 3. Re-score
   const rankings = scoreAllDiseases(allDiseaseSymptoms, newAnswers);
 
   // 4. Determine phase
   const newPhase = newCount >= prioritySymptoms.length ? "climbing" : "seed";
 
-  // 5. Check stop conditions
-  const hitThreshold = shouldStop(rankings);
-  const hitMaxQuestions = newCount >= MAX_QUESTIONS;
+  // 5. Pick next question first so we know if there's anything left to ask
   const nextQuestion = pickNextQuestion(
     allDiseaseSymptoms,
     rankings,
     newAsked,
     prioritySymptoms,
   );
+
+  // 6. Check stop conditions
+  // shouldStop only fires after MIN_QUESTIONS_BEFORE_STOP questions answered
+  const hitThreshold =
+    newCount >= MIN_QUESTIONS_BEFORE_STOP && shouldStop(rankings);
+  const hitMaxQuestions = newCount >= MAX_QUESTIONS;
   const noMoreQuestions = nextQuestion === null;
 
   if (hitThreshold || hitMaxQuestions || noMoreQuestions) {
@@ -154,7 +162,7 @@ export async function processAnswer(
     };
   }
 
-  // 6. Continue - return next question
+  // 7. Continue
   return {
     state: {
       ...state,
