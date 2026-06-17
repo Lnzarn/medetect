@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import BottomNav from '../components/BottomNav';
+
 import Colors from '../constants/colors';
 import ScreenLayout from './ScreenLayout';
+
 
 const C = Colors;
 
@@ -13,6 +14,11 @@ export default function FollowUpScreen() {
   const [questionText] = useState('');
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [pastAnswers] = useState<any[]>([]);
+
+  const handleNavClick = (key: string) => {
+    if (key === 'calendar') router.push('/pill_sched');
+    if (key === 'add') router.push('/page1');
+  };
 
   return (
     <ScreenLayout
@@ -26,6 +32,7 @@ export default function FollowUpScreen() {
         if (!selectedAnswer) return;
         router.push('/page2');
       }}
+      onNavClick={handleNavClick}
     >
       <View style={styles.content}>
         <View style={styles.questionCard}>
@@ -57,25 +64,12 @@ export default function FollowUpScreen() {
             >
               <Text style={[styles.optionBtnText, styles.btnNoText]}>No</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.optionBtn,
-                styles.btnNotSure,
-                selectedAnswer === 'Not Sure' ? styles.btnSelected : null,
-              ]}
-              onPress={() => setSelectedAnswer('Not Sure')}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.optionBtnText, styles.btnNotSureText]}>Not Sure</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>
     </ScreenLayout>
   );
 }
-
 const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 22,
@@ -83,17 +77,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   questionCard: {
-    minHeight: 350,
+    minHeight: 350, 
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 12,
     paddingHorizontal: 22,
-    paddingTop: 35,
-    paddingBottom: 22,
+    paddingTop: 35, 
+    paddingBottom: 22, 
     backgroundColor: C.white,
     marginTop: 10,
     marginBottom: 5,
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', 
   },
   questionTextWrapper: {},
   questionEyebrow: {
@@ -106,22 +100,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '900',
     color: C.text,
-    marginBottom: 40,
+    marginBottom: 40, 
     lineHeight: 30,
   },
+  
   optionsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
+    gap: 16, 
   },
   optionBtn: {
     flex: 1,
-    maxWidth: 110,
-    paddingVertical: 10,
+    maxWidth: 100, 
+    paddingVertical: 10, 
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
   btnYes: {
     backgroundColor: C.primary,
     borderColor: C.primary,
@@ -130,6 +126,7 @@ const styles = StyleSheet.create({
   btnYesText: {
     color: C.white,
   },
+ 
   btnNo: {
     backgroundColor: C.white,
     borderColor: C.greyLight,
@@ -138,21 +135,14 @@ const styles = StyleSheet.create({
   btnNoText: {
     color: C.text,
   },
-  btnNotSure: {
-    backgroundColor: '#F3F4F6',
-    borderColor: C.greyLight,
-    borderWidth: 2,
-  },
-  btnNotSureText: {
-    color: '#4B5563',
-  },
+  
   btnSelected: {
-    borderColor: '#1F2937',
-    borderWidth: 2,
-    borderRadius: 8,
-  },
+  borderColor: '#1F2937', 
+  borderWidth: 2,        
+  borderRadius: 8,        
+},
   optionBtnText: {
-    fontSize: 16,
+    fontSize: 16, 
     fontWeight: '700',
   },
 });
