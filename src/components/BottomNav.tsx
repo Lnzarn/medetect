@@ -1,36 +1,42 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Image,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Image,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 
-import profileIco from "../icons/profile.png";
-import calendarIco from "../icons/calendar.png";
 import addIco from "../icons/add.png";
+import calendarIco from "../icons/calendar.png";
 import navigationIco from "../icons/navigation.png";
+import profileIco from "../icons/profile.png";
 import settingsIco from "../icons/settings.png";
 
-export default function BottomNav() {
+interface BottomNavProps {
+  onNavigate?: (key: string) => void;
+}
+
+export default function BottomNav({ onNavigate }: BottomNavProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("calendar");
 
+
   const tabs = [
     { key: "profile", label: "Profile", icon: profileIco },
     { key: "calendar", label: "Pill Schedule", icon: calendarIco },
-    { key: "add",label: "Consult", icon: addIco, center: true },
+    { key: "add", label: "Consult", icon: addIco, center: true },
     { key: "navigation", label: "Map", icon: navigationIco },
     { key: "settings", label: "Settings", icon: settingsIco },
   ];
 
   const handleTabPress = (key: string) => {
     setActiveTab(key);
+    onNavigate?.(key);
 
     switch (key) {
       case "profile":
