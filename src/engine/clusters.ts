@@ -5,6 +5,7 @@ export type ClusterKey =
   | "eyes"
   | "digestive"
   | "pain_mobility"
+  | "cardiovascular"
   | "urinary"
   | "general";
 
@@ -59,12 +60,17 @@ export const CLUSTERS: Cluster[] = [
   {
     key: "digestive",
     label: "Digestive",
-    diseases: ["GERD", "Hepatitis A", "Jaundice"],
+    diseases: ["GERD", "Hepatitis A", "Jaundice", "Constipation"],
   },
   {
     key: "pain_mobility",
     label: "Pain & Mobility",
-    diseases: ["Osteoarthritis", "Migraine", "Dengue", "Malaria"],
+    diseases: ["Osteoarthritis", "Migraine", "Dengue", "Malaria", "Arthritis"],
+  },
+  {
+    key: "cardiovascular",
+    label: "Heart & Blood Pressure",
+    diseases: ["Hypertension"],
   },
   {
     key: "urinary",

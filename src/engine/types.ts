@@ -1,7 +1,6 @@
 export type Answer = 1 | 0 | -1;
 
 export interface DiseaseScore {
-<<<<<<< HEAD
   disease: string;
   score: number;
   confidence: number;
@@ -23,9 +22,3 @@ export interface AssessmentResult {
   stoppedReason: "threshold_met" | "max_questions" | "no_more_questions";
   totalQuestionsAsked: number;
 }
-=======
-    disease: string;
-    score: number;
-    confidence: number;
-}
->>>>>>> e1294d2c8f9b9f1df3e514db99bf3ee5ee5e7fa6
