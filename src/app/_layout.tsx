@@ -31,6 +31,12 @@ export default function RootLayout() {
         name="pill_sched"
         options={{ headerShown: false, animation: "slide_from_right" }}
       />
+
+      {/* results is Step 3 - assessment results */}
+      <Stack.Screen
+        name="results"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
     </Stack>
   );
 }
