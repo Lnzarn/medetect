@@ -6,6 +6,12 @@ export interface DiseaseScore {
   confidence: number;
 }
 
+export interface HillClimbState {
+  currentPeak: string;
+  visitedPeaks: Set<string>;
+  iterationsAtPeak: number;
+}
+
 export interface SessionState {
   category: string;
   answers: Record<string, Answer>;
@@ -14,6 +20,8 @@ export interface SessionState {
   phase: "seed" | "climbing" | "done";
   questionCount: number;
   result: AssessmentResult | null;
+  hillClimb: HillClimbState;
+  confidenceMode?: "strict" | "normal" | "possibles";
 }
 
 export interface AssessmentResult {

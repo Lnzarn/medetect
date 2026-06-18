@@ -1,13 +1,37 @@
-// engine/session.ts
-
-import { getAllDiseaseSymptoms } from "@/lib/sync";
+import { getAllDiseaseSymptoms, getPreference } from "@/lib/sync";
 import { ClusterKey, getCluster } from "./clusters";
 import { getClusterPrioritySymptoms, pickNextQuestion } from "./questionPicker";
-import { scoreAllDiseases, shouldStop } from "./scorer";
-import { Answer, AssessmentResult, SessionState } from "./types";
+import { hillClimb, scoreAllDiseases, shouldStop } from "./scorer";
+import {
+  Answer,
+  AssessmentResult,
+  HillClimbState,
+  SessionState,
+} from "./types";
 
-const MAX_QUESTIONS = 15;
-const MIN_QUESTIONS_BEFORE_STOP = 8; // must complete full seed phase first
+const CONFIDENCE_SETTINGS: Record<
+  "strict" | "normal" | "possibles",
+  {
+    threshold: number;
+    maxQuestions: number;
+    minQuestions: number;
+    seedCount: number;
+  }
+> = {
+  strict: {
+    threshold: 0.85,
+    maxQuestions: 20,
+    minQuestions: 10,
+    seedCount: 12,
+  },
+  normal: { threshold: 0.75, maxQuestions: 15, minQuestions: 8, seedCount: 8 },
+  possibles: {
+    threshold: 0.6,
+    maxQuestions: 12,
+    minQuestions: 6,
+    seedCount: 6,
+  },
+};
 
 const EMERGENCY_SYMPTOMS = [
   "Chest_Pain",
@@ -27,23 +51,38 @@ async function getDiseaseSymptoms() {
   return _cachedDiseaseSymptoms;
 }
 
+async function getConfidenceMode(): Promise<"strict" | "normal" | "possibles"> {
+  const pref = await getPreference("confidence");
+  if (pref === "strict" || pref === "possibles") return pref;
+  return "normal";
+}
+
 export async function initSession(
   categoryKey: ClusterKey,
 ): Promise<{ state: SessionState; firstQuestion: string | null }> {
   const allDiseaseSymptoms = await getDiseaseSymptoms();
   const cluster = getCluster(categoryKey);
+  const mode = await getConfidenceMode();
+  const settings = CONFIDENCE_SETTINGS[mode];
 
   const clusterDiseases =
     cluster && cluster.diseases.length > 0
       ? cluster.diseases
       : Object.keys(allDiseaseSymptoms);
-
   const prioritySymptoms = getClusterPrioritySymptoms(
     allDiseaseSymptoms,
     clusterDiseases,
+    settings.seedCount,
   );
 
   const rankings = scoreAllDiseases(allDiseaseSymptoms, {});
+
+  const initialPeak = rankings[0]?.disease ?? "";
+  const hillClimbState: HillClimbState = {
+    currentPeak: initialPeak,
+    visitedPeaks: new Set([initialPeak]),
+    iterationsAtPeak: 0,
+  };
 
   const state: SessionState = {
     category: categoryKey,
@@ -53,6 +92,8 @@ export async function initSession(
     phase: "seed",
     questionCount: 0,
     result: null,
+    hillClimb: hillClimbState,
+    confidenceMode: mode,
   };
 
   const firstQuestion = pickNextQuestion(
@@ -76,6 +117,8 @@ export async function processAnswer(
 }> {
   const allDiseaseSymptoms = await getDiseaseSymptoms();
   const cluster = getCluster(state.category as ClusterKey);
+  const mode = state.confidenceMode ?? "normal";
+  const settings = CONFIDENCE_SETTINGS[mode];
 
   const clusterDiseases =
     cluster && cluster.diseases.length > 0
@@ -85,14 +128,15 @@ export async function processAnswer(
   const prioritySymptoms = getClusterPrioritySymptoms(
     allDiseaseSymptoms,
     clusterDiseases,
+    settings.seedCount,
   );
 
-  // 1. Record answer
+  // Step 1: Record answer
   const newAnswers = { ...state.answers, [symptom]: answer };
   const newAsked = [...state.askedSymptoms, symptom];
   const newCount = state.questionCount + 1;
 
-  // 2. Emergency check — always runs regardless of question count
+  // Emergency check
   if (answer === 1 && EMERGENCY_SYMPTOMS.includes(symptom)) {
     const rankings = scoreAllDiseases(allDiseaseSymptoms, newAnswers);
     const result: AssessmentResult = {
@@ -109,36 +153,50 @@ export async function processAnswer(
         questionCount: newCount,
         phase: "done",
         result,
+        hillClimb: state.hillClimb,
       },
       nextQuestion: null,
       result,
     };
   }
 
-  // 3. Re-score
+  // Step 2: Score
   const rankings = scoreAllDiseases(allDiseaseSymptoms, newAnswers);
 
-  // 4. Determine phase
+  // Step 3: Hill Climbing
+  const { hillState: newHillState, peak } = hillClimb(
+    rankings,
+    allDiseaseSymptoms,
+    state.hillClimb,
+  );
+
+  const peakEntry = rankings.find((r) => r.disease === peak.disease);
+  const reorderedRankings =
+    peakEntry && peakEntry.confidence > rankings[0].confidence
+      ? [peakEntry, ...rankings.filter((r) => r.disease !== peak.disease)]
+      : rankings;
+
+  // Step 4: Phase
   const newPhase = newCount >= prioritySymptoms.length ? "climbing" : "seed";
 
-  // 5. Pick next question first so we know if there's anything left to ask
+  // Step 5: Next question
   const nextQuestion = pickNextQuestion(
     allDiseaseSymptoms,
-    rankings,
+    reorderedRankings,
     newAsked,
     prioritySymptoms,
   );
 
-  // 6. Check stop conditions
-  // shouldStop only fires after MIN_QUESTIONS_BEFORE_STOP questions answered
+  // Step 6: Stop conditions (uses per-mode threshold & limits)
   const hitThreshold =
-    newCount >= MIN_QUESTIONS_BEFORE_STOP && shouldStop(rankings);
-  const hitMaxQuestions = newCount >= MAX_QUESTIONS;
+    newCount >= settings.minQuestions &&
+    shouldStop(reorderedRankings, settings.threshold);
+  const hitMaxQuestions = newCount >= settings.maxQuestions;
   const noMoreQuestions = nextQuestion === null;
 
   if (hitThreshold || hitMaxQuestions || noMoreQuestions) {
     const result: AssessmentResult = {
-      topMatches: rankings.slice(0, 5),
+      topMatches: reorderedRankings.slice(0, 3),
       isEmergency: false,
       stoppedReason: hitThreshold
         ? "threshold_met"
@@ -152,25 +210,28 @@ export async function processAnswer(
         ...state,
         answers: newAnswers,
         askedSymptoms: newAsked,
-        rankings,
+        rankings: reorderedRankings,
         questionCount: newCount,
         phase: "done",
         result,
+        hillClimb: newHillState,
       },
       nextQuestion: null,
       result,
     };
   }
 
-  // 7. Continue
+  // Step 7: Continue
   return {
     state: {
       ...state,
       answers: newAnswers,
       askedSymptoms: newAsked,
-      rankings,
+      rankings: reorderedRankings,
       questionCount: newCount,
       phase: newPhase,
+      hillClimb: newHillState,
+      confidenceMode: mode,
     },
     nextQuestion,
     result: null,

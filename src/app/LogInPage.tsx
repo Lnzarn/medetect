@@ -47,13 +47,12 @@ export default function LoginScreen() {
       Alert.alert("Login failed", error.message);
       return;
     }
-    // Replace so the back button cannot return to LogInPage
+
     router.replace("/page1");
   }
 
   function handleGuest() {
     setGuest();
-    // Replace so the back button cannot return to LogInPage
     router.replace("/page1");
   }
 
@@ -93,7 +92,6 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.bottomContainer}>
-            {/* Primary: Log In */}
             <TouchableOpacity
               style={styles.button}
               onPress={handleLogin}
@@ -107,7 +105,6 @@ export default function LoginScreen() {
               )}
             </TouchableOpacity>
 
-            {/* Guest entry */}
             <TouchableOpacity
               style={[localStyles.guestBtn, { borderColor: colors.primary }]}
               onPress={handleGuest}

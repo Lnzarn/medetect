@@ -1,5 +1,3 @@
-// engine/questionPicker.ts
-
 import { DiseaseScore } from "./types";
 
 const MEANINGFUL_PROBABILITY = 0.1;
@@ -76,8 +74,7 @@ function getTargetedQuestion(
 
   if (Object.keys(symptomGains).length === 0) return null;
 
-  return Object.entries(symptomGains)
-    .sort(([, a], [, b]) => b - a)[0][0];
+  return Object.entries(symptomGains).sort(([, a], [, b]) => b - a)[0][0];
 }
 
 export function pickNextQuestion(

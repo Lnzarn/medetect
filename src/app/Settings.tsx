@@ -1,15 +1,15 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,13 +22,23 @@ import referencesIcon from "../icons/references.png";
 import settingsProfileIcon from "../icons/settings_profile.png";
 
 import {
-    canSync,
-    getLastSynced,
-    getPreference,
-    setPreference,
-    syncDiseaseData,
+  canSync,
+  getLastSynced,
+  getPreference,
+  setPreference,
+  syncDiseaseData,
 } from "@/lib/sync";
 import BottomNav from "../components/BottomNav";
+
+type SyncInterval = "12h" | "24h" | "72h" | "168h" | "720h";
+
+const SYNC_INTERVAL_OPTIONS: { value: SyncInterval; label: string }[] = [
+  { value: "12h", label: "Every 12 hours" },
+  { value: "24h", label: "Every 24 hours" },
+  { value: "72h", label: "Every 3 days" },
+  { value: "168h", label: "Every week" },
+  { value: "720h", label: "Every month" },
+];
 
 const MenuItem = ({
   icon,
@@ -82,9 +92,11 @@ export default function SettingsPage() {
   const [syncing, setSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [canDoSync, setCanDoSync] = useState(true);
+  const [syncIntervalHours, setSyncIntervalHours] = useState<number>(24);
   const [confidence, setConfidence] = useState<
     "strict" | "normal" | "possibles"
   >("normal");
+  const [syncInterval, setSyncInterval] = useState<SyncInterval>("24h");
 
   useEffect(() => {
     async function load() {
@@ -92,6 +104,7 @@ export default function SettingsPage() {
       setLastSynced(last);
       const syncOk = await canSync();
       setCanDoSync(syncOk.can);
+      setSyncIntervalHours(syncOk.intervalHours);
 
       const pref = (await getPreference("confidence")) as
         | "strict"
@@ -99,6 +112,11 @@ export default function SettingsPage() {
         | "possibles"
         | null;
       if (pref) setConfidence(pref);
+
+      const interval = (await getPreference(
+        "sync_interval",
+      )) as SyncInterval | null;
+      if (interval) setSyncInterval(interval);
     }
     load();
   }, []);
@@ -108,9 +126,12 @@ export default function SettingsPage() {
     try {
       const ok = await canSync();
       if (!ok.can) {
+        const intervalLabel =
+          SYNC_INTERVAL_OPTIONS.find((o) => o.value === syncInterval)?.label ??
+          "every 24 hours";
         Alert.alert(
           "Sync blocked",
-          `Last sync was: ${ok.lastSynced ?? "unknown"}. You can sync once every 24 hours.`,
+          `Last sync was: ${ok.lastSynced ?? "unknown"}.\nYou can sync ${intervalLabel.toLowerCase()}.`,
         );
         return;
       }
@@ -120,6 +141,7 @@ export default function SettingsPage() {
       setLastSynced(last);
       const syncOk = await canSync();
       setCanDoSync(syncOk.can);
+      setSyncIntervalHours(syncOk.intervalHours);
       Alert.alert("Sync complete", "Disease database updated successfully.");
     } catch (e) {
       console.error(e);
@@ -134,6 +156,14 @@ export default function SettingsPage() {
   ) => {
     setConfidence(val);
     await setPreference("confidence", val);
+  };
+
+  const handleSetSyncInterval = async (val: SyncInterval) => {
+    setSyncInterval(val);
+    await setPreference("sync_interval", val);
+    const syncOk = await canSync();
+    setCanDoSync(syncOk.can);
+    setSyncIntervalHours(syncOk.intervalHours);
   };
 
   const handleLogout = () => {
@@ -154,6 +184,14 @@ export default function SettingsPage() {
       ],
     );
   };
+
+  const nextSyncLabel = (() => {
+    if (!lastSynced) return "Never synced";
+    const next = new Date(
+      new Date(lastSynced).getTime() + syncIntervalHours * 60 * 60 * 1000,
+    );
+    return `Next sync: ${next.toLocaleString()}`;
+  })();
 
   return (
     <SafeAreaView
@@ -192,7 +230,6 @@ export default function SettingsPage() {
         )}
 
         <View style={styles.menuGroup}>
-          {/* Dark mode */}
           <View
             style={[
               styles.menuItem,
@@ -214,6 +251,10 @@ export default function SettingsPage() {
               Confidence Level
             </Text>
           </View>
+          <Text style={[styles.sectionHint, { color: colors.textMuted }]}>
+            Strict asks more questions and needs a stronger match before
+            concluding. Possibles wraps up sooner with broader results.
+          </Text>
 
           <View
             style={[
@@ -225,71 +266,88 @@ export default function SettingsPage() {
               },
             ]}
           >
-            <TouchableOpacity
-              onPress={() => handleSetConfidence("strict")}
-              style={[
-                styles.radioBtn,
-                { paddingVertical: 8, paddingHorizontal: 6 },
-              ]}
-            >
-              <View
+            {(
+              [
+                { val: "strict", label: "Strict" },
+                { val: "normal", label: "Normal" },
+                { val: "possibles", label: "Possibles" },
+              ] as const
+            ).map(({ val, label }, i) => (
+              <TouchableOpacity
+                key={val}
+                onPress={() => handleSetConfidence(val)}
                 style={[
-                  styles.radioCircle,
-                  { borderColor: colors.border },
-                  confidence === "strict" && {
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary,
-                  },
+                  styles.radioBtn,
+                  i > 0 && { marginLeft: 18 },
+                  { paddingVertical: 8, paddingHorizontal: 6 },
                 ]}
-              />
-              <Text style={[styles.radioLabel, { color: colors.text }]}>
-                Strict — 80%+
-              </Text>
-            </TouchableOpacity>
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    { borderColor: colors.border },
+                    confidence === val && {
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                />
+                <Text style={[styles.radioLabel, { color: colors.text }]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-            <TouchableOpacity
-              onPress={() => handleSetConfidence("normal")}
-              style={[
-                styles.radioBtn,
-                { marginLeft: 18, paddingVertical: 8, paddingHorizontal: 6 },
-              ]}
+          <View style={[styles.menuItem, { borderBottomWidth: 0 }]}>
+            <Text
+              style={[styles.menuText, { fontSize: 16, color: colors.text }]}
             >
-              <View
-                style={[
-                  styles.radioCircle,
-                  { borderColor: colors.border },
-                  confidence === "normal" && {
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary,
-                  },
-                ]}
-              />
-              <Text style={[styles.radioLabel, { color: colors.text }]}>
-                Normal — 60%+
-              </Text>
-            </TouchableOpacity>
+              Auto-Sync Interval
+            </Text>
+          </View>
+          <Text style={[styles.sectionHint, { color: colors.textMuted }]}>
+            How often the disease database is automatically refreshed in the
+            background.
+          </Text>
 
-            <TouchableOpacity
-              onPress={() => handleSetConfidence("possibles")}
-              style={[
-                styles.radioBtn,
-                { marginLeft: 18, paddingVertical: 8, paddingHorizontal: 6 },
-              ]}
-            >
-              <View
-                style={[
-                  styles.radioCircle,
-                  { borderColor: colors.border },
-                  confidence === "possibles" && {
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary,
-                  },
-                ]}
-              />
-              <Text style={[styles.radioLabel, { color: colors.text }]}>
-                Possibles — 50%+
-              </Text>
-            </TouchableOpacity>
+          <View
+            style={[
+              styles.intervalGrid,
+              {
+                borderBottomWidth: 1,
+                borderBottomColor: colors.border,
+                paddingBottom: 16,
+              },
+            ]}
+          >
+            {SYNC_INTERVAL_OPTIONS.map(({ value, label }) => {
+              const active = syncInterval === value;
+              return (
+                <TouchableOpacity
+                  key={value}
+                  onPress={() => handleSetSyncInterval(value)}
+                  style={[
+                    styles.intervalChip,
+                    {
+                      borderColor: active ? colors.primary : colors.border,
+                      backgroundColor: active
+                        ? colors.primary + "18"
+                        : "transparent",
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.intervalChipText,
+                      { color: active ? colors.primary : colors.textMuted },
+                    ]}
+                  >
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {!isGuest && (
@@ -338,6 +396,11 @@ export default function SettingsPage() {
               Last sync:{" "}
               {lastSynced ? new Date(lastSynced).toLocaleString() : "Never"}
             </Text>
+            {lastSynced && (
+              <Text style={[styles.lastSyncText, { color: colors.textMuted }]}>
+                {nextSyncLabel}
+              </Text>
+            )}
           </View>
 
           <MenuItem
@@ -412,6 +475,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  sectionHint: {
+    fontSize: 12,
+    marginBottom: 8,
+    lineHeight: 17,
+  },
   radioBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -425,6 +493,22 @@ const styles = StyleSheet.create({
     borderColor: "#9CA3AF",
   },
   radioLabel: { fontSize: 13 },
+  intervalGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingTop: 4,
+  },
+  intervalChip: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+  },
+  intervalChipText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
   syncBtn: {
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -439,7 +523,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   lastSyncText: {
-    marginTop: 8,
+    marginTop: 4,
     fontSize: 13,
   },
   arrowImg: {

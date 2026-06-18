@@ -11,7 +11,7 @@ interface ProbRow {
 }
 
 export async function syncDiseaseData(force = false): Promise<void> {
-  if (_syncInProgress) return; // ADD THIS
+  if (_syncInProgress) return;
   _syncInProgress = true;
 
   const db = await getDB();
@@ -25,9 +25,12 @@ export async function syncDiseaseData(force = false): Promise<void> {
     if (meta?.value) {
       const lastSynced = new Date(meta.value);
       const hoursSince = (Date.now() - lastSynced.getTime()) / 1000 / 60 / 60;
+      const intervalHours = await getSyncIntervalHours(db);
 
-      if (hoursSince < 24) {
-        console.log(`Skipped - last synced ${hoursSince.toFixed(1)}hrs ago`);
+      if (hoursSince < intervalHours) {
+        console.log(
+          `Skipped - last synced ${hoursSince.toFixed(1)}hrs ago (interval: ${intervalHours}h)`,
+        );
         return;
       }
     }
@@ -100,16 +103,35 @@ export async function getLastSynced(): Promise<string | null> {
   return meta?.value ?? null;
 }
 
+// Options: "12h" | "24h" (default) | "72h" | "168h" (1 week) | "720h" (1 month)
+async function getSyncIntervalHours(db?: any): Promise<number> {
+  const resolvedDb = db ?? (await getDB());
+  const row = await resolvedDb.getFirstAsync<{ value: string }>(
+    `SELECT value FROM sync_meta WHERE key = ?`,
+    "sync_interval",
+  );
+  const map: Record<string, number> = {
+    "12h": 12,
+    "24h": 24,
+    "72h": 72,
+    "168h": 168,
+    "720h": 720,
+  };
+  return map[row?.value ?? "24h"] ?? 24;
+}
+
 export async function canSync(): Promise<{
   can: boolean;
   lastSynced: string | null;
+  intervalHours: number;
 }> {
   const last = await getLastSynced();
-  if (!last) return { can: true, lastSynced: null };
+  const intervalHours = await getSyncIntervalHours();
+  if (!last) return { can: true, lastSynced: null, intervalHours };
 
   const lastDate = new Date(last);
   const hoursSince = (Date.now() - lastDate.getTime()) / 1000 / 60 / 60;
-  return { can: hoursSince >= 24, lastSynced: last };
+  return { can: hoursSince >= intervalHours, lastSynced: last, intervalHours };
 }
 
 export async function getPreference(key: string): Promise<string | null> {
