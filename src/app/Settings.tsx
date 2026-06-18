@@ -26,7 +26,7 @@ import {
   getLastSynced,
   getPreference,
   setPreference,
-  syncDiseaseData,
+  syncAll,
 } from "@/lib/sync";
 import BottomNav from "../components/BottomNav";
 
@@ -87,7 +87,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const colors = useAppColors();
   const { isDark, setDark } = useTheme();
-  const { signOut, isGuest } = useAuth();
+  const { signOut, isGuest, session } = useAuth();
 
   const [syncing, setSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
@@ -136,7 +136,7 @@ export default function SettingsPage() {
         return;
       }
       setSyncing(true);
-      await syncDiseaseData(false);
+      await syncAll(session?.user?.id ?? "", false);
       const last = await getLastSynced();
       setLastSynced(last);
       const syncOk = await canSync();
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: 48,
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingBottom: 120,
   },
   headerTitle: {
     fontSize: 22,

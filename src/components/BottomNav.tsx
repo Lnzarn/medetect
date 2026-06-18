@@ -14,8 +14,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import addIco from "../icons/add.png";
 import calendarIco from "../icons/calendar.png";
+import referencesIco from "../icons/folder.png";
 import profileIco from "../icons/profile.png";
-import referencesIco from "../icons/references.png";
 import settingsIco from "../icons/settings.png";
 
 interface BottomNavProps {

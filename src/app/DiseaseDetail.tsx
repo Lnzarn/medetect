@@ -4,14 +4,14 @@ import { useAppColors } from "@/lib/theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,7 +22,6 @@ interface SymptomRow {
   probability: number;
 }
 
-// Static disease descriptions — extend as needed
 const DISEASE_DESCRIPTIONS: Record<string, string> = {
   Dengue:
     "A mosquito-borne viral infection causing high fever, severe headache, pain behind the eyes, joint and muscle pain, rash, and mild bleeding. Common in tropical regions.",
@@ -85,7 +84,6 @@ function getClusterForDisease(disease: string) {
 }
 
 function getProbabilityBar(prob: number) {
-  // prob > 0.01 means associated; show strength
   const pct = Math.round(prob * 100);
   let color = "#10B981";
   if (prob >= 0.6) color = "#EF4444";
@@ -112,7 +110,6 @@ export default function DiseaseDetail() {
     getSymptomsForDisease(disease)
       .then((rows) => {
         if (!mounted) return;
-        // Only show symptoms that are actually associated (prob > 0.01)
         setSymptoms(rows.filter((r) => r.probability > 0.01));
       })
       .catch(console.error)
@@ -133,7 +130,6 @@ export default function DiseaseDetail() {
         backgroundColor={colors.background}
       />
 
-      {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.primary }]}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -157,7 +153,6 @@ export default function DiseaseDetail() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Description */}
         <View
           style={[
             styles.section,
@@ -172,7 +167,6 @@ export default function DiseaseDetail() {
           </Text>
         </View>
 
-        {/* Category */}
         <View
           style={[
             styles.section,
@@ -195,7 +189,6 @@ export default function DiseaseDetail() {
           </View>
         </View>
 
-        {/* Symptoms */}
         <View
           style={[
             styles.section,
@@ -241,7 +234,6 @@ export default function DiseaseDetail() {
           )}
         </View>
 
-        {/* Disclaimer */}
         <Text style={[styles.disclaimer, { color: colors.textMuted }]}>
           ⚠️ This directory is for informational purposes only. Always consult a
           licensed healthcare provider for diagnosis and treatment.

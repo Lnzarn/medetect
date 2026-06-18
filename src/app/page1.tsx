@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
-    paddingBottom: 80,
+    paddingBottom: 130,
   },
   continueBtn: {
     borderRadius: 14,

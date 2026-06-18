@@ -2,11 +2,11 @@ import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 
 type AuthMode = "loggedIn" | "guest" | null;
@@ -46,6 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session) {
         setSession(session);
         setMode("loggedIn");
+        // Sync history in background on login
+        import("./sync")
+          .then(({ syncAll }) => syncAll(session.user.id))
+          .catch(console.warn);
       }
       setLoading(false);
     });
@@ -57,6 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session) {
         setSession(session);
         setMode("loggedIn");
+        // Sync history in background on login
+        import("./sync")
+          .then(({ syncAll }) => syncAll(session.user.id))
+          .catch(console.warn);
       } else if (event === "SIGNED_OUT") {
         setSession(null);
         setMode(null);

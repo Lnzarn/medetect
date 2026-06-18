@@ -1,14 +1,17 @@
+import { useAuth } from "@/lib/auth";
+import { saveAssessment } from "@/lib/history";
 import { getPreference } from "@/lib/sync";
 import { useAppColors } from "@/lib/theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNav from "../components/BottomNav";
@@ -43,6 +46,7 @@ function getStoppedReasonText(reason: AssessmentResult["stoppedReason"]) {
 export default function ResultsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { session, isGuest } = useAuth();
 
   const result = useMemo<AssessmentResult | null>(() => {
     if (!params.result) return null;
@@ -53,9 +57,14 @@ export default function ResultsScreen() {
     }
   }, [params.result]);
 
+  const category = (params.category as string) ?? "general";
+  const isReadonly = params.readonly === "1";
+
   const [confidencePref, setConfidencePref] = useState<
     "strict" | "normal" | "possibles"
   >("normal");
+  const [saving, setSaving] = useState(false);
+  const savedRef = useRef(false); // prevent double-save
   const colors = useAppColors();
 
   useEffect(() => {
@@ -72,8 +81,6 @@ export default function ResultsScreen() {
       mounted = false;
     };
   }, []);
-
-  const handleBottomNav = (_key: string) => {};
 
   if (!result) {
     return (
@@ -101,6 +108,54 @@ export default function ResultsScreen() {
   );
   const top = filteredMatches[0] ?? result.topMatches[0];
   const severity = getSeverity(top?.confidence ?? 0, result.isEmergency);
+
+  const handleSaveAndRestart = async () => {
+    if (saving || savedRef.current) return;
+
+    if (isGuest || !session?.user?.id) {
+      Alert.alert(
+        "Not logged in",
+        "You need to be logged in to save assessments.",
+      );
+      return;
+    }
+
+    try {
+      setSaving(true);
+      savedRef.current = true;
+      await saveAssessment({
+        userId: session.user.id,
+        category,
+        topMatches: result.topMatches,
+        isEmergency: result.isEmergency,
+        stoppedReason: result.stoppedReason,
+        questionsAsked: result.totalQuestionsAsked,
+        confidenceLevel: confidencePref,
+      });
+      router.replace("/page1");
+    } catch (e) {
+      console.error(e);
+      savedRef.current = false;
+      Alert.alert("Save failed", "Could not save the assessment. Try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDiscardAndRestart = () => {
+    Alert.alert(
+      "Discard results?",
+      "This assessment will not be saved to your history.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => router.replace("/page1"),
+        },
+      ],
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
@@ -202,34 +257,52 @@ export default function ResultsScreen() {
         ))}
       </ScrollView>
 
-      <View style={styles.footer}>
-        {(top?.confidence ?? 0) >= 0.6 && (
-          <TouchableOpacity
-            style={[
-              styles.clinicBtn,
-              { backgroundColor: colors.primary, shadowColor: colors.primary },
-            ]}
-            onPress={() => router.push("/map")}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.clinicBtnText, { color: colors.white }]}>
-              📍 Find Nearest Clinic
-            </Text>
-          </TouchableOpacity>
-        )}
-
+      {isReadonly ? (
         <TouchableOpacity
-          style={styles.retryBtn}
-          onPress={() => router.push("/page1")}
+          style={[styles.backBtn, { borderColor: colors.border }]}
+          onPress={() => router.back()}
           activeOpacity={0.85}
         >
-          <Text style={[styles.retryBtnText, { color: colors.white }]}>
-            Start New Assessment
+          <Text style={[styles.backBtnText, { color: colors.text }]}>
+            ← Back
           </Text>
         </TouchableOpacity>
-      </View>
+      ) : (
+        <View style={styles.footer}>
+          {!isGuest && (
+            <TouchableOpacity
+              style={[
+                styles.saveBtn,
+                {
+                  backgroundColor: colors.primary,
+                  shadowColor: colors.primary,
+                },
+                saving && { opacity: 0.6 },
+              ]}
+              onPress={handleSaveAndRestart}
+              activeOpacity={0.85}
+              disabled={saving}
+            >
+              <Text style={[styles.saveBtnText, { color: colors.white }]}>
+                {saving ? "Saving…" : "💾 Save & Start Over"}
+              </Text>
+            </TouchableOpacity>
+          )}
 
-      <BottomNav />
+          {/* Discard — secondary action */}
+          <TouchableOpacity
+            style={[styles.discardBtn, { borderColor: colors.border }]}
+            onPress={handleDiscardAndRestart}
+            activeOpacity={0.85}
+          >
+            <Text style={[styles.discardBtnText, { color: colors.textMuted }]}>
+              Discard & Start Over
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!isReadonly && <BottomNav />}
     </SafeAreaView>
   );
 }
@@ -302,7 +375,6 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 12,
-    color: "#6B7280",
     lineHeight: 17,
     marginBottom: 14,
   },
@@ -351,10 +423,10 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
-    paddingBottom: 80,
+    paddingBottom: 130,
     gap: 10,
   },
-  clinicBtn: {
+  saveBtn: {
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
@@ -363,18 +435,31 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  clinicBtnText: {
+  saveBtnText: {
     fontSize: 16,
     fontWeight: "800",
   },
-  retryBtn: {
-    backgroundColor: "#6B7280",
+  discardBtn: {
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
+    borderWidth: 1.5,
   },
-  retryBtnText: {
+  discardBtnText: {
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: "700",
+  },
+  backBtn: {
+    marginHorizontal: 22,
+    marginVertical: 10,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  backBtnText: {
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

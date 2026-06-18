@@ -5,13 +5,13 @@ import { useAppColors } from "@/lib/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -58,7 +58,6 @@ export default function DiseaseDirectory() {
     };
   }, []);
 
-  // Build cluster filter tabs from actual diseases
   const clusterTabs = useMemo(() => {
     const used = new Set<string>();
     diseases.forEach((d) => {
@@ -90,7 +89,6 @@ export default function DiseaseDirectory() {
         backgroundColor={colors.background}
       />
 
-      {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.primary }]}>
         <Text style={styles.headerTitle}>Disease Directory</Text>
         <Text style={styles.headerSub}>
@@ -98,7 +96,6 @@ export default function DiseaseDirectory() {
         </Text>
       </View>
 
-      {/* Cluster Filter Chips */}
       {!loading && (
         <View
           style={[styles.filterWrapper, { backgroundColor: colors.background }]}

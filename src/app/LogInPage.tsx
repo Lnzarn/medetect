@@ -66,6 +66,16 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          <TouchableOpacity
+            onPress={() => router.replace("/")}
+            style={localStyles.backButton}
+            activeOpacity={0.7}
+          >
+            <Text style={[localStyles.backLink, { color: colors.primary }]}> 
+              ← Back
+            </Text>
+          </TouchableOpacity>
+
           <Text style={styles.headerTitle}>LOGIN</Text>
 
           <View style={styles.formContainer}>
@@ -132,6 +142,15 @@ export default function LoginScreen() {
 }
 
 const localStyles = StyleSheet.create({
+  backButton: {
+    marginBottom: 8,
+    marginTop: -18,
+    alignSelf: "flex-start",
+  },
+  backLink: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
   guestBtn: {
     borderWidth: 2,
     borderRadius: 14,

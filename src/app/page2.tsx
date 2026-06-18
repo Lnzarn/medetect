@@ -29,7 +29,6 @@ export default function QuestionScreen() {
   const [selectedAnswer, setSelectedAnswer] = useState<Answer | null>(null);
   const sessionRef = useRef<SessionState | null>(null);
 
-  // Initialize session on mount
   useEffect(() => {
     const init = async () => {
       try {
@@ -61,7 +60,6 @@ export default function QuestionScreen() {
       setSelectedAnswer(null);
 
       if (result) {
-        // Session complete → go to results
         const encoded = encodeURIComponent(JSON.stringify(result));
         router.push(`/results?result=${encoded}`);
       } else if (nextQuestion) {
@@ -81,7 +79,6 @@ export default function QuestionScreen() {
   const questionNumber = (sessionRef.current?.questionCount ?? 0) + 1;
   const questionText = currentQuestion ? getQuestion(currentQuestion) : "";
 
-  // Full screen loading on init
   if (loading) {
     return (
       <SafeAreaView
@@ -108,7 +105,6 @@ export default function QuestionScreen() {
 
       <View style={styles.content}>
         {processing ? (
-          // Inline loading while processing answer
           <View style={styles.processingWrapper}>
             <Loading size={60} message="Analyzing your answer..." />
           </View>
@@ -142,9 +138,9 @@ export default function QuestionScreen() {
                 <Text
                   style={[
                     styles.optionBtnText,
-                    selectedAnswer === 1
-                      ? styles.btnYesTextSelected
-                      : styles.btnYesText,
+                    {
+                      color: selectedAnswer === 1 ? "#FFFFFF" : colors.primary,
+                    },
                   ]}
                 >
                   Yes
@@ -155,12 +151,12 @@ export default function QuestionScreen() {
                 style={[
                   styles.optionBtn,
                   {
-                    backgroundColor: colors.surface,
+                    backgroundColor: colors.elementBg,
                     borderColor: colors.border,
                   },
                   selectedAnswer === 0 && {
-                    backgroundColor: colors.elementBg,
-                    borderColor: colors.border,
+                    backgroundColor: "#6B7280",
+                    borderColor: "#6B7280",
                   },
                 ]}
                 onPress={() => setSelectedAnswer(0)}
@@ -169,9 +165,10 @@ export default function QuestionScreen() {
                 <Text
                   style={[
                     styles.optionBtnText,
-                    selectedAnswer === 0
-                      ? styles.btnUnsureTextSelected
-                      : styles.btnUnsureText,
+                    {
+                      color:
+                        selectedAnswer === 0 ? "#FFFFFF" : colors.textMuted,
+                    },
                   ]}
                 >
                   Not Sure
@@ -196,9 +193,7 @@ export default function QuestionScreen() {
                 <Text
                   style={[
                     styles.optionBtnText,
-                    selectedAnswer === -1
-                      ? styles.btnNoTextSelected
-                      : styles.btnNoText,
+                    { color: selectedAnswer === -1 ? "#FFFFFF" : colors.text },
                   ]}
                 >
                   No
@@ -315,7 +310,7 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
-    paddingBottom: 80,
+    paddingBottom: 130,
   },
   continueBtn: {
     borderRadius: 14,

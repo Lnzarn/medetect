@@ -210,3 +210,15 @@ export async function getAllDiseaseSymptoms(): Promise<
 
   return result;
 }
+
+export { syncAssessmentHistory } from "./history";
+
+export async function syncAll(
+  userId: string,
+  force = false,
+): Promise<{ historyPushed: number; historyPulled: number }> {
+  await syncDiseaseData(force);
+  const { syncAssessmentHistory } = await import("./history");
+  const { pushed, pulled } = await syncAssessmentHistory(userId);
+  return { historyPushed: pushed, historyPulled: pulled };
+}

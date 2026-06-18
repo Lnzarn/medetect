@@ -1,5 +1,5 @@
-import { useAppColors } from '@/lib/theme';
-import { StyleSheet } from 'react-native';
+import { useAppColors } from "@/lib/theme";
+import { StyleSheet } from "react-native";
 
 export default function useSharedStyles() {
   const colors = useAppColors();
@@ -16,14 +16,14 @@ export default function useSharedStyles() {
       flexGrow: 1,
       paddingHorizontal: 24,
       paddingTop: 100,
-      paddingBottom: 80,
+      paddingBottom: 130,
     },
     headerTitle: {
       fontSize: 32,
-      fontWeight: '900',
+      fontWeight: "900",
       color: colors.text,
       letterSpacing: 2,
-      textAlign: 'center',
+      textAlign: "center",
       marginBottom: 60,
     },
     formContainer: {
@@ -31,7 +31,7 @@ export default function useSharedStyles() {
     },
     label: {
       fontSize: 14,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text,
       marginBottom: 8,
     },
@@ -47,16 +47,16 @@ export default function useSharedStyles() {
       backgroundColor: colors.elementBg,
     },
     bottomContainer: {
-      alignItems: 'center',
-      marginTop: 'auto',
+      alignItems: "center",
+      marginTop: "auto",
     },
     button: {
       backgroundColor: colors.primaryDark,
       paddingVertical: 16,
       paddingHorizontal: 40,
       borderRadius: 14,
-      width: '60%',
-      alignItems: 'center',
+      width: "100%",
+      alignItems: "center",
       marginBottom: 20,
       shadowColor: colors.black,
       shadowOffset: { width: 0, height: 4 },
@@ -67,11 +67,11 @@ export default function useSharedStyles() {
     buttonText: {
       color: colors.white,
       fontSize: 16,
-      fontWeight: '800',
+      fontWeight: "800",
     },
     footerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
     },
     footerText: {
       fontSize: 13,
@@ -80,7 +80,7 @@ export default function useSharedStyles() {
     footerLink: {
       fontSize: 13,
       color: colors.primaryDark,
-      fontWeight: '800',
+      fontWeight: "800",
     },
   });
 }
