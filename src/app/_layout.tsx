@@ -1,5 +1,5 @@
 import { syncDiseaseData } from "@/lib/sync";
-import { ThemeProvider } from '@/lib/theme';
+import { ThemeProvider } from "@/lib/theme";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 
@@ -37,12 +37,6 @@ export default function RootLayout() {
         {/* results is Step 3 - assessment results */}
         <Stack.Screen
           name="results"
-          options={{ headerShown: false, animation: "slide_from_right" }}
-        />
-
-        {/* map page for finding nearby hospitals */}
-        <Stack.Screen
-          name="map"
           options={{ headerShown: false, animation: "slide_from_right" }}
         />
 

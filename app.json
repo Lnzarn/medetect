@@ -8,11 +8,7 @@
     "scheme": "medetect",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/medetect_logo.png",
-      "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app uses your location to find nearby hospitals and emergency services.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to find nearby hospitals and emergency services."
-      }
+      "icon": "./assets/images/medetect_logo.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,11 +17,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.group7.medetect",
-      "googleMapsApiKey": "AIzaSyBoz9JG1du9JX-Q-l0bdEcqIxTQ5gzd_aE",
-      "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
-      ]
+      "permissions": []
     },
     "web": {
       "output": "static",
@@ -43,13 +35,7 @@
           }
         }
       ],
-      "expo-sqlite",
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
-        }
-      ]
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

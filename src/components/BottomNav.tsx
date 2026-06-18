@@ -1,13 +1,7 @@
-import { useAppColors } from '@/lib/theme';
+import { useAppColors } from "@/lib/theme";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import addIco from "../icons/add.png";
@@ -53,7 +47,6 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
         break;
 
       case "navigation":
-        router.push("/map");
         break;
 
       case "settings":
@@ -69,7 +62,10 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
     <View
       style={[
         styles.bottomNavContainer,
-        { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.navBg },
+        {
+          paddingBottom: Math.max(insets.bottom, 8),
+          backgroundColor: colors.navBg,
+        },
       ]}
     >
       <View style={styles.bottomNavBar}>
@@ -84,7 +80,13 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
                 <Image source={tab.icon} style={styles.fabIcon} />
               </TouchableOpacity>
 
-              <Text style={[styles.centerLabel, activeTab === tab.key && styles.centerActiveLabel, { color: colors.white }]}>
+              <Text
+                style={[
+                  styles.centerLabel,
+                  activeTab === tab.key && styles.centerActiveLabel,
+                  { color: colors.white },
+                ]}
+              >
                 {tab.label}
               </Text>
             </View>
@@ -115,13 +117,18 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
                 style={[
                   styles.label,
                   activeTab === tab.key && styles.activeLabel,
-                  { color: activeTab === tab.key ? colors.white : 'rgba(255,255,255,0.75)' },
+                  {
+                    color:
+                      activeTab === tab.key
+                        ? colors.white
+                        : "rgba(255,255,255,0.75)",
+                  },
                 ]}
               >
                 {tab.label}
               </Text>
             </TouchableOpacity>
-          )
+          ),
         )}
       </View>
     </View>
