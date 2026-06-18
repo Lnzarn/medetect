@@ -1,8 +1,7 @@
-import { useAppColors } from '@/lib/theme';
+import { useAppColors } from "@/lib/theme";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNav from "../components/BottomNav";
 import StepBar from "../components/StepBar";
 import { CLUSTERS, ClusterKey } from "../engine/clusters";
@@ -25,15 +25,18 @@ export default function CategoryPickerScreen() {
     router.push(`/page2?category=${selected}`);
   };
 
-  const handleBottomNav = (key: string) => {
-    if (key === "calendar") router.push("/pill_sched");
+  const handleBottomNav = (_key: string) => {
+    // no-op: BottomNav performs routing centrally
   };
 
   const colors = useAppColors();
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      <StatusBar
+        barStyle={colors.text === "#FFFFFF" ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
 
       <View style={styles.topSection}>
         <StepBar step={1} total={3} />
@@ -58,7 +61,10 @@ export default function CategoryPickerScreen() {
               style={[
                 styles.card,
                 { borderColor: colors.border, backgroundColor: colors.surface },
-                isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                isSelected && {
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
               ]}
               onPress={() => handleSelect(cluster.key)}
               activeOpacity={0.75}
@@ -89,11 +95,13 @@ export default function CategoryPickerScreen() {
           activeOpacity={0.85}
           disabled={!selected}
         >
-          <Text style={[styles.continueBtnText, { color: colors.white }]}>Continue →</Text>
+          <Text style={[styles.continueBtnText, { color: colors.white }]}>
+            Continue →
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <BottomNav onNavigate={handleBottomNav} />
+      <BottomNav />
     </SafeAreaView>
   );
 }
@@ -133,8 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  cardSelected: {
-  },
+  cardSelected: {},
   cardEmoji: { fontSize: 32 },
   cardLabel: {
     fontSize: 13,
@@ -145,7 +152,7 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 80,
   },
   continueBtn: {
     borderRadius: 14,

@@ -1,7 +1,7 @@
 import { useAuth } from "@/lib/auth";
 import { useAppColors } from "@/lib/theme";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { usePathname, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import addIco from "../icons/add.png";
 import calendarIco from "../icons/calendar.png";
 import profileIco from "../icons/profile.png";
+import referencesIco from "../icons/references.png";
 import settingsIco from "../icons/settings.png";
 
 interface BottomNavProps {
@@ -24,10 +25,21 @@ interface BottomNavProps {
 export default function BottomNav({ onNavigate }: BottomNavProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const pathname = usePathname();
   const colors = useAppColors();
   const { isGuest } = useAuth();
 
   const [activeTab, setActiveTab] = useState("add");
+
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname.startsWith("/AccountPage")) setActiveTab("profile");
+    else if (pathname.startsWith("/pill_sched")) setActiveTab("calendar");
+    else if (pathname.startsWith("/page1")) setActiveTab("add");
+    else if (pathname.startsWith("/DiseaseDirectory"))
+      setActiveTab("directory");
+    else if (pathname.startsWith("/Settings")) setActiveTab("settings");
+  }, [pathname]);
 
   const allTabs = [
     { key: "profile", label: "Profile", icon: profileIco, guestAllowed: false },
@@ -42,6 +54,12 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
       label: "Consult",
       icon: addIco,
       center: true,
+      guestAllowed: true,
+    },
+    {
+      key: "directory",
+      label: "Directory",
+      icon: referencesIco,
       guestAllowed: true,
     },
     {
@@ -66,7 +84,31 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
     }
 
     setActiveTab(key);
+
+    // Perform navigation here (centralized). Also notify parent via
+    // onNavigate for any side-effects; parents should NOT push themselves
+    // to avoid duplicate navigation.
     onNavigate?.(key);
+
+    // Prevent pushing the same route repeatedly — if already on the
+    // target path, do nothing. This avoids stacking duplicate screens
+    // when the user taps the active tab multiple times.
+    const path = pathname;
+    const target =
+      key === "profile"
+        ? "/AccountPage"
+        : key === "calendar"
+          ? "/pill_sched"
+          : key === "add"
+            ? "/page1"
+            : key === "directory"
+              ? "/DiseaseDirectory"
+              : key === "settings"
+                ? "/Settings"
+                : null;
+
+    if (!target) return;
+    if (path && path.startsWith(target)) return;
 
     switch (key) {
       case "profile":
@@ -77,6 +119,9 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
         break;
       case "add":
         router.push("/page1");
+        break;
+      case "directory":
+        router.push("/DiseaseDirectory");
         break;
       case "settings":
         router.push("/Settings");
@@ -173,6 +218,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 12,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   bottomNavBar: {
     height: 78,
@@ -187,7 +236,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   iconContainer: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 16,
   },
@@ -205,7 +254,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: 4,
-    fontSize: 11,
+    fontSize: 10,
     color: "rgba(255,255,255,0.75)",
     fontWeight: "500",
   },
@@ -241,7 +290,7 @@ const styles = StyleSheet.create({
   },
   centerLabel: {
     marginTop: 2,
-    fontSize: 11,
+    fontSize: 10,
     color: "rgba(255,255,255,0.75)",
     fontWeight: "500",
   },

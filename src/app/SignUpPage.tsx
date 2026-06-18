@@ -6,13 +6,13 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import useSharedStyles from "../constants/sharedStyles";
 export default function SignUpScreen() {
   const router = useRouter();
@@ -117,9 +117,7 @@ export default function SignUpScreen() {
             </TouchableOpacity>
 
             <View style={styles.footerRow}>
-              <Text style={styles.footerText}>
-                Already have an account?{" "}
-              </Text>
+              <Text style={styles.footerText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => router.push("/LogInPage")}>
                 <Text style={styles.footerLink}>Log In</Text>
               </TouchableOpacity>

@@ -1,19 +1,19 @@
-import { useAppColors } from '@/lib/theme';
+import { useAppColors } from "@/lib/theme";
 import React, { useMemo, useState } from "react";
 import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
+    Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Constants & Styles
 import useSharedStyles from "../constants/sharedStyles";
@@ -21,7 +21,9 @@ import useSharedStyles from "../constants/sharedStyles";
 // Components
 import BottomNav from "../components/BottomNav";
 import CalendarModal from "../components/Calendar";
-import MedicationCard, { type MedicationItem } from "../components/MedicationCard";
+import MedicationCard, {
+    type MedicationItem,
+} from "../components/MedicationCard";
 import ProgressMetrics from "../components/PillProgress";
 import TimePickerModal from "../components/TimePicker";
 
@@ -51,7 +53,9 @@ export default function PillSched() {
   };
 
   // State
-  const [selectedDateISO, setSelectedDateISO] = useState(formatToISO(new Date()));
+  const [selectedDateISO, setSelectedDateISO] = useState(
+    formatToISO(new Date()),
+  );
   const selectedDateReadable = formatISOToReadable(selectedDateISO);
   const [isMedModalVisible, setIsMedModalVisible] = useState(false);
   const [isCalModalVisible, setIsCalModalVisible] = useState(false);
@@ -67,7 +71,11 @@ export default function PillSched() {
   const metrics = useMemo(() => {
     const total = activeDayItems.length;
     const taken = activeDayItems.filter((item) => item.taken).length;
-    return { taken, total, percentage: total === 0 ? 0 : (taken / total) * 100 };
+    return {
+      taken,
+      total,
+      percentage: total === 0 ? 0 : (taken / total) * 100,
+    };
   }, [activeDayItems]);
 
   const handleCreateMedication = () => {
@@ -87,13 +95,20 @@ export default function PillSched() {
       <View style={styles.header}>
         <View style={styles.iconButton} />
         <View style={styles.headerTitleWrap}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Schedule</Text>
-          <Text style={[styles.headerDateText, { color: colors.textMuted }]}>{selectedDateReadable}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Schedule
+          </Text>
+          <Text style={[styles.headerDateText, { color: colors.textMuted }]}>
+            {selectedDateReadable}
+          </Text>
         </View>
         <View style={styles.iconButton} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollArea} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollArea}
+        showsVerticalScrollIndicator={false}
+      >
         <ProgressMetrics {...metrics} />
 
         <Text style={styles.timeDivider}>Schedule</Text>
@@ -114,11 +129,21 @@ export default function PillSched() {
       </ScrollView>
 
       {/* Floating Buttons */}
-      <TouchableOpacity style={[styles.fabCal, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setIsCalModalVisible(true)} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[
+          styles.fabCal,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+        onPress={() => setIsCalModalVisible(true)}
+        activeOpacity={0.8}
+      >
         <Text style={{ fontSize: 22, color: colors.text }}>📅</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primaryDark }]} onPress={() => setIsMedModalVisible(true)}>
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primaryDark }]}
+        onPress={() => setIsMedModalVisible(true)}
+      >
         <Text style={[styles.fabText, { color: colors.white }]}>+</Text>
       </TouchableOpacity>
 
@@ -157,7 +182,11 @@ export default function PillSched() {
             <TouchableWithoutFeedback>
               <View style={styles.modalSheet}>
                 <View style={styles.modalHeader}>
-                  <Text style={[styles.modalSheetTitle, { color: colors.text }]}>Add Medication</Text>
+                  <Text
+                    style={[styles.modalSheetTitle, { color: colors.text }]}
+                  >
+                    Add Medication
+                  </Text>
                   <TouchableOpacity onPress={() => setIsMedModalVisible(false)}>
                     <Text style={{ fontSize: 28, color: colors.text }}>✕</Text>
                   </TouchableOpacity>
@@ -169,42 +198,74 @@ export default function PillSched() {
                   // Added paddingBottom here so the button isn't hugging the keyboard
                   contentContainerStyle={{ paddingBottom: 24 }}
                 >
-                  <Text style={[sharedStyles.label, { color: colors.text }]}>Medication Name</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>
+                    Medication Name
+                  </Text>
                   <TextInput
-                    style={[sharedStyles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+                    style={[
+                      sharedStyles.input,
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                        color: colors.text,
+                      },
+                    ]}
                     placeholder="e.g. Aspirin"
                     placeholderTextColor={colors.textMuted}
                     value={medName}
                     onChangeText={setMedName}
                   />
 
-                  <Text style={[sharedStyles.label, { color: colors.text }]}>Dosage / Info</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>
+                    Dosage / Info
+                  </Text>
                   <TextInput
-                    style={[sharedStyles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+                    style={[
+                      sharedStyles.input,
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                        color: colors.text,
+                      },
+                    ]}
                     placeholder="e.g. 100mg tablet"
                     placeholderTextColor={colors.textMuted}
                     value={medInfo}
                     onChangeText={setMedInfo}
                   />
 
-                  <Text style={[sharedStyles.label, { color: colors.text }]}>Time (HH:MM)</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>
+                    Time (HH:MM)
+                  </Text>
                   <TouchableOpacity
                     style={[
                       sharedStyles.input,
-                      { alignItems: "center", paddingVertical: 14, marginBottom: 40, backgroundColor: colors.surface, borderColor: colors.border },
+                      {
+                        alignItems: "center",
+                        paddingVertical: 14,
+                        marginBottom: 40,
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                      },
                     ]}
                     onPress={() => {
                       Keyboard.dismiss();
                       setShowCustomTimePicker(true);
                     }}
                   >
-                    <Text style={{ fontSize: 18, fontWeight: "600", color: colors.text }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: colors.text,
+                      }}
+                    >
                       {medTime}
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[sharedStyles.button, { width: '100%' }]}
+                    style={[sharedStyles.button, { width: "100%" }]}
                     onPress={handleCreateMedication}
                   >
                     <Text style={sharedStyles.buttonText}>Add Medication</Text>

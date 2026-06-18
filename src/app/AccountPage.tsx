@@ -1,3 +1,4 @@
+import BottomNav from "@/components/BottomNav";
 import { supabase } from "@/lib/supabase";
 import React, { useEffect, useState } from "react";
 import {
@@ -5,13 +6,13 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import useSharedStyles from "../constants/sharedStyles";
 export default function AccountScreen() {
   const styles = useSharedStyles();
@@ -117,6 +118,7 @@ export default function AccountScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <BottomNav />
     </SafeAreaView>
   );
 }

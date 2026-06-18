@@ -1,14 +1,14 @@
-import { useAppColors } from '@/lib/theme';
+import { useAppColors } from "@/lib/theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNav from "../components/BottomNav";
 import Loading from "../components/Loading";
 import StepBar from "../components/StepBar";
@@ -46,7 +46,8 @@ export default function QuestionScreen() {
   }, [category]);
 
   const handleContinue = async () => {
-    if (!selectedAnswer || !currentQuestion || !sessionRef.current) return;
+    if (selectedAnswer === null || !currentQuestion || !sessionRef.current)
+      return;
 
     setProcessing(true);
     try {
@@ -73,8 +74,8 @@ export default function QuestionScreen() {
     }
   };
 
-  const handleBottomNav = (key: string) => {
-    if (key === "calendar") router.push("/pill_sched");
+  const handleBottomNav = (_key: string) => {
+    // no-op: BottomNav performs routing centrally
   };
 
   const questionNumber = (sessionRef.current?.questionCount ?? 0) + 1;
@@ -83,7 +84,9 @@ export default function QuestionScreen() {
   // Full screen loading on init
   if (loading) {
     return (
-      <SafeAreaView style={[styles.loadingScreen, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.loadingScreen, { backgroundColor: colors.background }]}
+      >
         <Loading message="Preparing your assessment..." />
       </SafeAreaView>
     );
@@ -91,11 +94,16 @@ export default function QuestionScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      <StatusBar
+        barStyle={colors.text === "#FFFFFF" ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
 
       <View style={styles.topSection}>
         <StepBar step={2} total={3} />
-        <Text style={[styles.title, { color: colors.text }]}>FOLLOW-UP{"\n"}QUESTIONS</Text>
+        <Text style={[styles.title, { color: colors.text }]}>
+          FOLLOW-UP{"\n"}QUESTIONS
+        </Text>
       </View>
 
       <View style={styles.content}>
@@ -110,7 +118,9 @@ export default function QuestionScreen() {
               <Text style={[styles.questionEyebrow, { color: colors.primary }]}>
                 QUESTION #{questionNumber}
               </Text>
-              <Text style={[styles.questionText, { color: colors.text }]}>{questionText}</Text>
+              <Text style={[styles.questionText, { color: colors.text }]}>
+                {questionText}
+              </Text>
             </View>
 
             <View style={styles.optionsRow}>
@@ -204,7 +214,8 @@ export default function QuestionScreen() {
           style={[
             styles.continueBtn,
             { backgroundColor: colors.primary, shadowColor: colors.primary },
-            (selectedAnswer === null || processing) && styles.continueBtnDisabled,
+            (selectedAnswer === null || processing) &&
+              styles.continueBtnDisabled,
           ]}
           onPress={handleContinue}
           activeOpacity={0.85}
@@ -214,7 +225,7 @@ export default function QuestionScreen() {
         </TouchableOpacity>
       </View>
 
-      <BottomNav onNavigate={handleBottomNav} />
+      <BottomNav />
     </SafeAreaView>
   );
 }
@@ -287,24 +298,24 @@ const styles = StyleSheet.create({
   // Yes
   btnYes: { borderWidth: 2 },
   btnYesSelected: {},
-  btnYesText: { fontWeight: '700' },
-  btnYesTextSelected: { fontWeight: '700' },
+  btnYesText: { fontWeight: "700" },
+  btnYesTextSelected: { fontWeight: "700" },
   // Not Sure
   btnUnsure: { borderWidth: 2 },
   btnUnsureSelected: {},
-  btnUnsureText: { fontWeight: '700' },
-  btnUnsureTextSelected: { fontWeight: '700' },
+  btnUnsureText: { fontWeight: "700" },
+  btnUnsureTextSelected: { fontWeight: "700" },
   // No
   btnNo: { borderWidth: 2 },
   btnNoSelected: {},
-  btnNoText: { fontWeight: '700' },
-  btnNoTextSelected: { fontWeight: '700' },
+  btnNoText: { fontWeight: "700" },
+  btnNoTextSelected: { fontWeight: "700" },
 
   optionBtnText: { fontSize: 15, fontWeight: "700" },
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 80,
   },
   continueBtn: {
     borderRadius: 14,

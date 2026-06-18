@@ -55,6 +55,14 @@ function RootStack() {
         name="Settings"
         options={{ headerShown: false, animation: "slide_from_right" }}
       />
+      <Stack.Screen
+        name="DiseaseDirectory"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="DiseaseDetail"
+        options={{ headerShown: false, animation: "slide_from_right" }}
+      />
     </Stack>
   );
 }
