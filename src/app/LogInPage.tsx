@@ -1,23 +1,32 @@
+import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { useAppColors } from "@/lib/theme";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import useSharedStyles from "../constants/sharedStyles";
+
+const { width: SW } = Dimensions.get("window");
 
 export default function LoginScreen() {
   const router = useRouter();
   const styles = useSharedStyles();
+  const colors = useAppColors();
+  const { setGuest } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,8 +47,16 @@ export default function LoginScreen() {
       Alert.alert("Login failed", error.message);
       return;
     }
-    router.push("/page1");
+    // Replace so the back button cannot return to LogInPage
+    router.replace("/page1");
   }
+
+  function handleGuest() {
+    setGuest();
+    // Replace so the back button cannot return to LogInPage
+    router.replace("/page1");
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -67,7 +84,7 @@ export default function LoginScreen() {
             <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
-              placeholder=".........."
+              placeholder="••••••••••"
               placeholderTextColor="#9CA3AF"
               value={password}
               onChangeText={setPassword}
@@ -76,6 +93,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.bottomContainer}>
+            {/* Primary: Log In */}
             <TouchableOpacity
               style={styles.button}
               onPress={handleLogin}
@@ -87,6 +105,20 @@ export default function LoginScreen() {
               ) : (
                 <Text style={styles.buttonText}>Log In</Text>
               )}
+            </TouchableOpacity>
+
+            {/* Guest entry */}
+            <TouchableOpacity
+              style={[localStyles.guestBtn, { borderColor: colors.primary }]}
+              onPress={handleGuest}
+              activeOpacity={0.8}
+              disabled={loading}
+            >
+              <Text
+                style={[localStyles.guestBtnText, { color: colors.primary }]}
+              >
+                Continue as Guest
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.footerRow}>
@@ -101,3 +133,20 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+const localStyles = StyleSheet.create({
+  guestBtn: {
+    borderWidth: 2,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    width: "100%",
+  },
+  guestBtnText: {
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+});

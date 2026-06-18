@@ -1,8 +1,8 @@
-// src/db/sync.ts
 import { supabase } from "@/lib/supabase";
 import { getDB } from "./client";
 
 const SYNC_KEY = "last_synced_probs";
+let _syncInProgress = false;
 
 interface ProbRow {
   disease: string;
@@ -11,6 +11,9 @@ interface ProbRow {
 }
 
 export async function syncDiseaseData(force = false): Promise<void> {
+  if (_syncInProgress) return; // ADD THIS
+  _syncInProgress = true;
+
   const db = await getDB();
 
   if (!force) {
@@ -97,7 +100,10 @@ export async function getLastSynced(): Promise<string | null> {
   return meta?.value ?? null;
 }
 
-export async function canSync(): Promise<{ can: boolean; lastSynced: string | null }> {
+export async function canSync(): Promise<{
+  can: boolean;
+  lastSynced: string | null;
+}> {
   const last = await getLastSynced();
   if (!last) return { can: true, lastSynced: null };
 
