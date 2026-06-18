@@ -1,3 +1,4 @@
+import { useAppColors } from '@/lib/theme';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -11,15 +12,13 @@ import {
 import BottomNav from "../components/BottomNav";
 import Loading from "../components/Loading";
 import StepBar from "../components/StepBar";
-import Colors from "../constants/colors";
 import { ClusterKey } from "../engine/clusters";
 import { getQuestion } from "../engine/questions";
 import { initSession, processAnswer } from "../engine/session";
 import { Answer, SessionState } from "../engine/types";
 
-const C = Colors;
-
 export default function QuestionScreen() {
+  const colors = useAppColors();
   const router = useRouter();
   const params = useLocalSearchParams();
   const category = (params.category as ClusterKey) ?? "general";
@@ -44,7 +43,7 @@ export default function QuestionScreen() {
       }
     };
     init();
-  }, []);
+  }, [category]);
 
   const handleContinue = async () => {
     if (!selectedAnswer || !currentQuestion || !sessionRef.current) return;
@@ -84,19 +83,19 @@ export default function QuestionScreen() {
   // Full screen loading on init
   if (loading) {
     return (
-      <SafeAreaView style={styles.loadingScreen}>
+      <SafeAreaView style={[styles.loadingScreen, { backgroundColor: colors.background }]}>
         <Loading message="Preparing your assessment..." />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor={C.white} />
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <View style={styles.topSection}>
         <StepBar step={2} total={3} />
-        <Text style={styles.title}>FOLLOW-UP{"\n"}QUESTIONS</Text>
+        <Text style={[styles.title, { color: colors.text }]}>FOLLOW-UP{"\n"}QUESTIONS</Text>
       </View>
 
       <View style={styles.content}>
@@ -108,18 +107,24 @@ export default function QuestionScreen() {
         ) : (
           <View style={styles.questionCard}>
             <View style={styles.questionTextWrapper}>
-              <Text style={styles.questionEyebrow}>
+              <Text style={[styles.questionEyebrow, { color: colors.primary }]}>
                 QUESTION #{questionNumber}
               </Text>
-              <Text style={styles.questionText}>{questionText}</Text>
+              <Text style={[styles.questionText, { color: colors.text }]}>{questionText}</Text>
             </View>
 
             <View style={styles.optionsRow}>
               <TouchableOpacity
                 style={[
                   styles.optionBtn,
-                  styles.btnYes,
-                  selectedAnswer === 1 && styles.btnYesSelected,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.primary,
+                  },
+                  selectedAnswer === 1 && {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                  },
                 ]}
                 onPress={() => setSelectedAnswer(1)}
                 activeOpacity={0.8}
@@ -139,8 +144,14 @@ export default function QuestionScreen() {
               <TouchableOpacity
                 style={[
                   styles.optionBtn,
-                  styles.btnUnsure,
-                  selectedAnswer === 0 && styles.btnUnsureSelected,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                  selectedAnswer === 0 && {
+                    backgroundColor: colors.elementBg,
+                    borderColor: colors.border,
+                  },
                 ]}
                 onPress={() => setSelectedAnswer(0)}
                 activeOpacity={0.8}
@@ -160,8 +171,14 @@ export default function QuestionScreen() {
               <TouchableOpacity
                 style={[
                   styles.optionBtn,
-                  styles.btnNo,
-                  selectedAnswer === -1 && styles.btnNoSelected,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.text,
+                  },
+                  selectedAnswer === -1 && {
+                    backgroundColor: colors.text,
+                    borderColor: colors.text,
+                  },
                 ]}
                 onPress={() => setSelectedAnswer(-1)}
                 activeOpacity={0.8}
@@ -182,12 +199,12 @@ export default function QuestionScreen() {
         )}
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
           style={[
             styles.continueBtn,
-            (!selectedAnswer === null || processing) &&
-              styles.continueBtnDisabled,
+            { backgroundColor: colors.primary, shadowColor: colors.primary },
+            (selectedAnswer === null || processing) && styles.continueBtnDisabled,
           ]}
           onPress={handleContinue}
           activeOpacity={0.85}
@@ -203,10 +220,9 @@ export default function QuestionScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.white },
+  safe: { flex: 1 },
   loadingScreen: {
     flex: 1,
-    backgroundColor: C.white,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -218,7 +234,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "900",
-    color: C.text,
     lineHeight: 30,
     marginTop: 8,
     marginBottom: 4,
@@ -236,12 +251,10 @@ const styles = StyleSheet.create({
   questionCard: {
     flex: 1,
     borderWidth: 1,
-    borderColor: C.text,
     borderRadius: 12,
     paddingHorizontal: 22,
     paddingTop: 35,
     paddingBottom: 22,
-    backgroundColor: C.white,
     marginTop: 10,
     marginBottom: 5,
     justifyContent: "space-between",
@@ -250,13 +263,11 @@ const styles = StyleSheet.create({
   questionEyebrow: {
     fontSize: 13,
     fontWeight: "800",
-    color: C.primary,
     marginBottom: 12,
   },
   questionText: {
     fontSize: 24,
     fontWeight: "900",
-    color: C.text,
     lineHeight: 32,
   },
   optionsRow: {
@@ -274,50 +285,43 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   // Yes
-  btnYes: { backgroundColor: C.white, borderColor: C.primary },
-  btnYesSelected: { backgroundColor: C.primary, borderColor: C.primary },
-  btnYesText: { color: C.primary },
-  btnYesTextSelected: { color: C.white },
+  btnYes: { borderWidth: 2 },
+  btnYesSelected: {},
+  btnYesText: { fontWeight: '700' },
+  btnYesTextSelected: { fontWeight: '700' },
   // Not Sure
-  btnUnsure: { backgroundColor: C.white, borderColor: Colors.greyLight },
-  btnUnsureSelected: {
-    backgroundColor: Colors.greyLight,
-    borderColor: Colors.greyLight,
-  },
-  btnUnsureText: { color: C.text },
-  btnUnsureTextSelected: { color: C.text },
+  btnUnsure: { borderWidth: 2 },
+  btnUnsureSelected: {},
+  btnUnsureText: { fontWeight: '700' },
+  btnUnsureTextSelected: { fontWeight: '700' },
   // No
-  btnNo: { backgroundColor: C.white, borderColor: C.text },
-  btnNoSelected: { backgroundColor: C.text, borderColor: C.text },
-  btnNoText: { color: C.text },
-  btnNoTextSelected: { color: C.white },
+  btnNo: { borderWidth: 2 },
+  btnNoSelected: {},
+  btnNoText: { fontWeight: '700' },
+  btnNoTextSelected: { fontWeight: '700' },
 
   optionBtnText: { fontSize: 15, fontWeight: "700" },
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
     paddingBottom: 10,
-    backgroundColor: C.white,
   },
   continueBtn: {
-    backgroundColor: C.primary,
     borderRadius: 14,
     paddingVertical: 17,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: C.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.28,
     shadowRadius: 8,
     elevation: 5,
   },
   continueBtnDisabled: {
-    backgroundColor: Colors.greyLight,
+    opacity: 0.6,
     shadowOpacity: 0,
     elevation: 0,
   },
   continueBtnText: {
-    color: C.white,
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.3,

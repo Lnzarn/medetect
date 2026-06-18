@@ -1,36 +1,35 @@
-import React, { useState, useMemo } from "react";
+import { useAppColors } from '@/lib/theme';
+import React, { useMemo, useState } from "react";
 import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
   TextInput,
-  SafeAreaView,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
+  TouchableOpacity,
   TouchableWithoutFeedback,
+  View
 } from "react-native";
-import { useRouter } from "expo-router";
 
 // Constants & Styles
-import Colors from "../constants/colors";
-import sharedStyles from "../constants/sharedStyles";
+import useSharedStyles from "../constants/sharedStyles";
 
 // Components
 import BottomNav from "../components/BottomNav";
+import CalendarModal from "../components/Calendar";
 import MedicationCard, { type MedicationItem } from "../components/MedicationCard";
 import ProgressMetrics from "../components/PillProgress";
-import CalendarModal from "../components/Calendar";
 import TimePickerModal from "../components/TimePicker";
 
 const MOCK_MEDICATIONS: MedicationItem[] = [];
 
 export default function PillSched() {
-  const router = useRouter();
+  const sharedStyles = useSharedStyles();
+  const colors = useAppColors();
 
   // Helper formats
   const formatToISO = (date: Date): string => {
@@ -88,8 +87,8 @@ export default function PillSched() {
       <View style={styles.header}>
         <View style={styles.iconButton} />
         <View style={styles.headerTitleWrap}>
-          <Text style={styles.headerTitle}>Schedule</Text>
-          <Text style={styles.headerDateText}>{selectedDateReadable}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Schedule</Text>
+          <Text style={[styles.headerDateText, { color: colors.textMuted }]}>{selectedDateReadable}</Text>
         </View>
         <View style={styles.iconButton} />
       </View>
@@ -115,12 +114,12 @@ export default function PillSched() {
       </ScrollView>
 
       {/* Floating Buttons */}
-      <TouchableOpacity style={styles.fabCal} onPress={() => setIsCalModalVisible(true)} activeOpacity={0.8}>
-        <Text style={{ fontSize: 22 }}>📅</Text>
+      <TouchableOpacity style={[styles.fabCal, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setIsCalModalVisible(true)} activeOpacity={0.8}>
+        <Text style={{ fontSize: 22, color: colors.text }}>📅</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.fab} onPress={() => setIsMedModalVisible(true)}>
-        <Text style={styles.fabText}>+</Text>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primaryDark }]} onPress={() => setIsMedModalVisible(true)}>
+        <Text style={[styles.fabText, { color: colors.white }]}>+</Text>
       </TouchableOpacity>
 
       <BottomNav />
@@ -144,23 +143,23 @@ export default function PillSched() {
       />
 
       {/* Add Medication Modal */}
-     {/* Add Medication Modal */}
+      {/* Add Medication Modal */}
       <Modal visible={isMedModalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior="padding" // Use padding for BOTH platforms; it animates smoother for bottom sheets
           style={{ flex: 1 }}
         >
-          <TouchableOpacity 
-            style={styles.modalOverlay} 
-            activeOpacity={1} 
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
             onPress={Keyboard.dismiss}
           >
             <TouchableWithoutFeedback>
               <View style={styles.modalSheet}>
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalSheetTitle}>Add Medication</Text>
+                  <Text style={[styles.modalSheetTitle, { color: colors.text }]}>Add Medication</Text>
                   <TouchableOpacity onPress={() => setIsMedModalVisible(false)}>
-                    <Text style={{ fontSize: 28, color: Colors.text }}>✕</Text>
+                    <Text style={{ fontSize: 28, color: colors.text }}>✕</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -168,38 +167,38 @@ export default function PillSched() {
                   showsVerticalScrollIndicator={false}
                   keyboardShouldPersistTaps="handled"
                   // Added paddingBottom here so the button isn't hugging the keyboard
-                  contentContainerStyle={{ paddingBottom: 24 }} 
+                  contentContainerStyle={{ paddingBottom: 24 }}
                 >
-                  <Text style={sharedStyles.label}>Medication Name</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>Medication Name</Text>
                   <TextInput
-                    style={sharedStyles.input}
+                    style={[sharedStyles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     placeholder="e.g. Aspirin"
-                    placeholderTextColor={Colors.greyLight}
+                    placeholderTextColor={colors.textMuted}
                     value={medName}
                     onChangeText={setMedName}
                   />
 
-                  <Text style={sharedStyles.label}>Dosage / Info</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>Dosage / Info</Text>
                   <TextInput
-                    style={sharedStyles.input}
+                    style={[sharedStyles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                     placeholder="e.g. 100mg tablet"
-                    placeholderTextColor={Colors.greyLight}
+                    placeholderTextColor={colors.textMuted}
                     value={medInfo}
                     onChangeText={setMedInfo}
                   />
 
-                  <Text style={sharedStyles.label}>Time (HH:MM)</Text>
+                  <Text style={[sharedStyles.label, { color: colors.text }]}>Time (HH:MM)</Text>
                   <TouchableOpacity
                     style={[
                       sharedStyles.input,
-                      { alignItems: "center", paddingVertical: 14, marginBottom: 40 },
+                      { alignItems: "center", paddingVertical: 14, marginBottom: 40, backgroundColor: colors.surface, borderColor: colors.border },
                     ]}
                     onPress={() => {
-                      Keyboard.dismiss(); 
+                      Keyboard.dismiss();
                       setShowCustomTimePicker(true);
                     }}
                   >
-                    <Text style={{ fontSize: 18, fontWeight: "600", color: Colors.text }}>
+                    <Text style={{ fontSize: 18, fontWeight: "600", color: colors.text }}>
                       {medTime}
                     </Text>
                   </TouchableOpacity>
@@ -227,19 +226,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 28,
-    backgroundColor: Colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.greyBorder,
+    borderBottomColor: "transparent",
   },
   iconButton: { width: 40, height: 40 },
   headerTitleWrap: { alignItems: "center", marginTop: 8 },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: Colors.text },
-  headerDateText: { fontSize: 12, color: Colors.grey, marginTop: 8 },
+  headerTitle: { fontSize: 18, fontWeight: "700" },
+  headerDateText: { fontSize: 12, marginTop: 8 },
   scrollArea: { padding: 16, paddingBottom: 200 },
   timeDivider: {
     fontSize: 14,
     fontWeight: "700",
-    color: Colors.grey,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginVertical: 20,
@@ -247,7 +244,6 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     fontSize: 13,
-    color: Colors.greyLight,
     textAlign: "center",
     paddingVertical: 12,
   },
@@ -258,12 +254,11 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,
   },
-  fabText: { fontSize: 28, color: Colors.white, fontWeight: "300" },
+  fabText: { fontSize: 28, fontWeight: "300" },
   fabCal: {
     position: "absolute",
     bottom: 188,
@@ -271,7 +266,6 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: Colors.white,
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,
@@ -282,7 +276,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: Colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -294,5 +287,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  modalSheetTitle: { fontSize: 18, fontWeight: "700", color: Colors.text },
+  modalSheetTitle: { fontSize: 18, fontWeight: "700" },
 });

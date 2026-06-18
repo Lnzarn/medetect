@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -12,10 +13,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import sharedStyles from "../constants/sharedStyles";
+import useSharedStyles from "../constants/sharedStyles";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const styles = useSharedStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,21 +41,21 @@ export default function LoginScreen() {
     router.push("/page1");
   }
   return (
-    <SafeAreaView style={sharedStyles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={sharedStyles.keyboardView}
+        style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={sharedStyles.scrollContent}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={sharedStyles.headerTitle}>LOGIN</Text>
+          <Text style={styles.headerTitle}>LOGIN</Text>
 
-          <View style={sharedStyles.formContainer}>
-            <Text style={sharedStyles.label}>E-mail:</Text>
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>E-mail:</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder="sample@gmail.com"
               placeholderTextColor="#9CA3AF"
               value={email}
@@ -62,9 +64,9 @@ export default function LoginScreen() {
               autoCapitalize="none"
             />
 
-            <Text style={sharedStyles.label}>Password</Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder=".........."
               placeholderTextColor="#9CA3AF"
               value={password}
@@ -73,21 +75,24 @@ export default function LoginScreen() {
             />
           </View>
 
-          <View style={sharedStyles.bottomContainer}>
+          <View style={styles.bottomContainer}>
             <TouchableOpacity
-              style={sharedStyles.button}
+              style={styles.button}
               onPress={handleLogin}
               activeOpacity={0.8}
+              disabled={loading}
             >
-              <Text style={sharedStyles.buttonText}>Log In</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Log In</Text>
+              )}
             </TouchableOpacity>
 
-            <View style={sharedStyles.footerRow}>
-              <Text style={sharedStyles.footerText}>
-                Don't have an account?{" "}
-              </Text>
+            <View style={styles.footerRow}>
+              <Text style={styles.footerText}>Do not have an account?</Text>
               <TouchableOpacity onPress={() => router.push("/SignUpPage")}>
-                <Text style={sharedStyles.footerLink}>Sign Up</Text>
+                <Text style={styles.footerLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>

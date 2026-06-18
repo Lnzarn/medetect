@@ -1,3 +1,4 @@
+import { useAppColors } from '@/lib/theme';
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -22,6 +23,7 @@ interface BottomNavProps {
 export default function BottomNav({ onNavigate }: BottomNavProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const colors = useAppColors();
 
   const [activeTab, setActiveTab] = useState("calendar");
 
@@ -67,7 +69,7 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
     <View
       style={[
         styles.bottomNavContainer,
-        { paddingBottom: Math.max(insets.bottom, 8) },
+        { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.navBg },
       ]}
     >
       <View style={styles.bottomNavBar}>
@@ -82,7 +84,7 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
                 <Image source={tab.icon} style={styles.fabIcon} />
               </TouchableOpacity>
 
-              <Text style={[styles.centerLabel, activeTab === tab.key && styles.centerActiveLabel]}>
+              <Text style={[styles.centerLabel, activeTab === tab.key && styles.centerActiveLabel, { color: colors.white }]}>
                 {tab.label}
               </Text>
             </View>
@@ -103,6 +105,7 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
                   source={tab.icon}
                   style={[
                     styles.navIcon,
+                    { tintColor: colors.white },
                     activeTab === tab.key && styles.activeNavIcon,
                   ]}
                 />
@@ -112,6 +115,7 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
                 style={[
                   styles.label,
                   activeTab === tab.key && styles.activeLabel,
+                  { color: activeTab === tab.key ? colors.white : 'rgba(255,255,255,0.75)' },
                 ]}
               >
                 {tab.label}

@@ -1,5 +1,7 @@
+import { getPreference } from "@/lib/sync";
+import { useAppColors } from '@/lib/theme';
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -11,7 +13,6 @@ import {
 } from "react-native";
 import BottomNav from "../components/BottomNav";
 import StepBar from "../components/StepBar";
-import Colors from "../constants/colors";
 import { AssessmentResult, DiseaseScore } from "../engine/types";
 
 const SEVERITY_LABELS: Record<string, { label: string; color: string }> = {
@@ -52,34 +53,48 @@ export default function ResultsScreen() {
         }
     }, [params.result]);
 
+    const [confidencePref, setConfidencePref] = useState<'strict' | 'normal' | 'possibles'>('normal');
+    const colors = useAppColors();
+
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            const pref = (await getPreference('confidence')) as 'strict' | 'normal' | 'possibles' | null;
+            if (mounted && pref) setConfidencePref(pref);
+        })();
+        return () => { mounted = false; };
+    }, []);
+
     const handleBottomNav = (key: string) => {
         if (key === "calendar") router.push("/pill_sched");
     };
 
     if (!result) {
         return (
-            <SafeAreaView style={styles.safe}>
+            <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
                 <View style={styles.errorWrapper}>
-                    <Text style={styles.errorText}>No results found.</Text>
+                    <Text style={[styles.errorText, { color: colors.text }]}>No results found.</Text>
                     <TouchableOpacity onPress={() => router.push("/page1")}>
-                        <Text style={styles.retryText}>Start Over</Text>
+                        <Text style={[styles.retryText, { color: colors.primary }]}>Start Over</Text>
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
         );
     }
 
-    const top = result.topMatches[0];
+    const threshold = confidencePref === 'strict' ? 0.8 : confidencePref === 'normal' ? 0.6 : 0.5;
+    const filteredMatches = result.topMatches.filter((m) => m.confidence >= threshold);
+    const top = filteredMatches[0] ?? result.topMatches[0];
     const severity = getSeverity(top?.confidence ?? 0, result.isEmergency);
 
     return (
-        <SafeAreaView style={styles.safe}>
-            <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+        <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
             <View style={styles.topSection}>
                 <StepBar step={3} total={3} />
-                <Text style={styles.title}>ASSESSMENT{"\n"}COMPLETE</Text>
-                <Text style={styles.subtitle}>
+                <Text style={[styles.title, { color: colors.text }]}>ASSESSMENT{"\n"}COMPLETE</Text>
+                <Text style={[styles.subtitle, { color: colors.text }]}>
                     {getStoppedReasonText(result.stoppedReason)}{" "}
                     {result.totalQuestionsAsked} question
                     {result.totalQuestionsAsked !== 1 ? "s" : ""} asked.
@@ -101,26 +116,30 @@ export default function ResultsScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Severity indicator */}
-                <View style={[styles.severityCard, { borderColor: severity.color }]}>
+                <View style={[styles.severityCard, { borderColor: severity.color, backgroundColor: colors.elementBg }]}>
                     <Text style={[styles.severityText, { color: severity.color }]}>
                         {severity.label}
                     </Text>
                 </View>
 
-                <Text style={styles.sectionTitle}>POSSIBLE CONDITIONS</Text>
-                <Text style={styles.disclaimer}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>POSSIBLE CONDITIONS</Text>
+                <Text style={[styles.disclaimer, { color: colors.textMuted }]}>
                     ⚠️ This is not a medical diagnosis. Always consult a healthcare
                     professional.
                 </Text>
 
-                {result.topMatches.map((match: DiseaseScore, index: number) => (
-                    <View key={match.disease} style={styles.conditionCard}>
+                {filteredMatches.length === 0 && (
+                    <Text style={{ color: colors.textMuted, marginVertical: 8 }}>No conditions meet the selected confidence threshold.</Text>
+                )}
+
+                {filteredMatches.map((match: DiseaseScore, index: number) => (
+                    <View key={match.disease} style={[styles.conditionCard, { borderColor: colors.textMuted }]}>
                         <View style={styles.cardHeader}>
-                            <View style={styles.rankBadge}>
-                                <Text style={styles.rankText}>#{index + 1}</Text>
+                            <View style={[styles.rankBadge, { backgroundColor: colors.primary }]}>
+                                <Text style={[styles.rankText, { color: colors.white }]}>#{index + 1}</Text>
                             </View>
-                            <Text style={styles.diseaseName}>{match.disease}</Text>
-                            <Text style={styles.matchPercentage}>
+                            <Text style={[styles.diseaseName, { color: colors.text }]}>{match.disease}</Text>
+                            <Text style={[styles.matchPercentage, { color: colors.primary }]}>
                                 {Math.round(match.confidence * 100)}%
                             </Text>
                         </View>
@@ -133,7 +152,7 @@ export default function ResultsScreen() {
                                     {
                                         width: `${Math.round(match.confidence * 100)}%`,
                                         backgroundColor:
-                                            index === 0 ? Colors.primary : Colors.greyLight,
+                                            index === 0 ? colors.primary : colors.border,
                                     },
                                 ]}
                             />
@@ -146,11 +165,11 @@ export default function ResultsScreen() {
                 {/* Find clinic — show if moderate or above */}
                 {(top?.confidence ?? 0) >= 0.6 && (
                     <TouchableOpacity
-                        style={styles.clinicBtn}
+                        style={[styles.clinicBtn, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
                         onPress={() => router.push("/map")}
                         activeOpacity={0.85}
                     >
-                        <Text style={styles.clinicBtnText}>📍 Find Nearest Clinic</Text>
+                        <Text style={[styles.clinicBtnText, { color: colors.white }]}>📍 Find Nearest Clinic</Text>
                     </TouchableOpacity>
                 )}
 
@@ -159,7 +178,7 @@ export default function ResultsScreen() {
                     onPress={() => router.push("/page1")}
                     activeOpacity={0.85}
                 >
-                    <Text style={styles.retryBtnText}>Start New Assessment</Text>
+                    <Text style={[styles.retryBtnText, { color: colors.white }]}>Start New Assessment</Text>
                 </TouchableOpacity>
             </View>
 
@@ -169,15 +188,15 @@ export default function ResultsScreen() {
 }
 
 const styles = StyleSheet.create({
-    safe: { flex: 1, backgroundColor: Colors.white },
+    safe: { flex: 1 },
     errorWrapper: {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
         gap: 12,
     },
-    errorText: { fontSize: 16, color: Colors.text },
-    retryText: { fontSize: 14, color: Colors.primary, fontWeight: "700" },
+    errorText: { fontSize: 16 },
+    retryText: { fontSize: 14, fontWeight: "700" },
 
     topSection: {
         paddingHorizontal: 22,
@@ -187,14 +206,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: "900",
-        color: Colors.text,
         lineHeight: 34,
         marginTop: 12,
         marginBottom: 8,
     },
     subtitle: {
         fontSize: 13,
-        color: Colors.text,
         lineHeight: 18,
     },
 
@@ -234,7 +251,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: "900",
-        color: Colors.text,
         marginBottom: 6,
     },
     disclaimer: {
@@ -246,7 +262,6 @@ const styles = StyleSheet.create({
 
     conditionCard: {
         borderWidth: 2,
-        borderColor: Colors.greyLight,
         borderRadius: 16,
         paddingHorizontal: 16,
         paddingVertical: 14,
@@ -262,21 +277,18 @@ const styles = StyleSheet.create({
         width: 28,
         height: 28,
         borderRadius: 14,
-        backgroundColor: Colors.primary,
         alignItems: "center",
         justifyContent: "center",
     },
-    rankText: { fontSize: 12, fontWeight: "900", color: Colors.white },
+    rankText: { fontSize: 12, fontWeight: "900" },
     diseaseName: {
         flex: 1,
         fontSize: 15,
         fontWeight: "900",
-        color: Colors.text,
     },
     matchPercentage: {
         fontSize: 14,
         fontWeight: "700",
-        color: Colors.primary,
     },
     barTrack: {
         height: 6,
@@ -296,18 +308,15 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     clinicBtn: {
-        backgroundColor: Colors.primary,
         borderRadius: 14,
         paddingVertical: 16,
         alignItems: "center",
-        shadowColor: Colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.28,
         shadowRadius: 8,
         elevation: 5,
     },
     clinicBtnText: {
-        color: Colors.white,
         fontSize: 16,
         fontWeight: "800",
     },
@@ -318,7 +327,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     retryBtnText: {
-        color: Colors.white,
         fontSize: 16,
         fontWeight: "800",
     },

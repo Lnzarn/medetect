@@ -97,6 +97,33 @@ export async function getLastSynced(): Promise<string | null> {
   return meta?.value ?? null;
 }
 
+export async function canSync(): Promise<{ can: boolean; lastSynced: string | null }> {
+  const last = await getLastSynced();
+  if (!last) return { can: true, lastSynced: null };
+
+  const lastDate = new Date(last);
+  const hoursSince = (Date.now() - lastDate.getTime()) / 1000 / 60 / 60;
+  return { can: hoursSince >= 24, lastSynced: last };
+}
+
+export async function getPreference(key: string): Promise<string | null> {
+  const db = await getDB();
+  const row = await db.getFirstAsync<{ value: string }>(
+    `SELECT value FROM sync_meta WHERE key = ?`,
+    key,
+  );
+  return row?.value ?? null;
+}
+
+export async function setPreference(key: string, value: string): Promise<void> {
+  const db = await getDB();
+  await db.runAsync(
+    `INSERT OR REPLACE INTO sync_meta (key, value) VALUES (?, ?)`,
+    key,
+    value,
+  );
+}
+
 export async function forceSync(): Promise<void> {
   return syncDiseaseData(true); // force = true skips the 24hr check
 }

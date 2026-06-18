@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useAppColors } from '@/lib/theme';
+import React, { useEffect, useState } from "react";
 import {
-  View,
+  Modal,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  ScrollView,
-  Modal,
-  StyleSheet,
+  View,
 } from "react-native";
-import Colors from "../constants/colors";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const MINUTES = Array.from({ length: 60 }, (_, i) =>
@@ -29,6 +29,7 @@ export default function TimePickerModal({
 }: Props) {
   const [tempHour, setTempHour] = useState("09");
   const [tempMinute, setTempMinute] = useState("00");
+  const colors = useAppColors();
 
   useEffect(() => {
     if (visible) {
@@ -40,9 +41,9 @@ export default function TimePickerModal({
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
-      <View style={styles.pickerOverlay}>
-        <View style={styles.pickerBox}>
-          <Text style={styles.pickerTitle}>Select Time</Text>
+      <View style={[styles.pickerOverlay, { backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+        <View style={[styles.pickerBox, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.pickerTitle, { color: colors.text }]}>Select Time</Text>
           <View style={styles.pickerRow}>
             <View style={styles.pickerColumn}>
               <Text style={styles.pickerColumnLabel}>Hour</Text>
@@ -55,14 +56,18 @@ export default function TimePickerModal({
                     key={`h-${h}`}
                     style={[
                       styles.pickerItem,
-                      tempHour === h && styles.pickerItemActive,
+                      tempHour === h && { backgroundColor: colors.primaryLight },
                     ]}
                     onPress={() => setTempHour(h)}
                   >
                     <Text
                       style={[
                         styles.pickerItemText,
-                        tempHour === h && styles.pickerItemTextActive,
+                        tempHour === h && {
+                          color: colors.primaryDark,
+                          fontWeight: "700",
+                          fontSize: 24,
+                        },
                       ]}
                     >
                       {h}
@@ -85,14 +90,18 @@ export default function TimePickerModal({
                     key={`m-${m}`}
                     style={[
                       styles.pickerItem,
-                      tempMinute === m && styles.pickerItemActive,
+                      tempMinute === m && { backgroundColor: colors.primaryLight },
                     ]}
                     onPress={() => setTempMinute(m)}
                   >
                     <Text
                       style={[
                         styles.pickerItemText,
-                        tempMinute === m && styles.pickerItemTextActive,
+                        tempMinute === m && {
+                          color: colors.primaryDark,
+                          fontWeight: "700",
+                          fontSize: 24,
+                        },
                       ]}
                     >
                       {m}
@@ -104,11 +113,11 @@ export default function TimePickerModal({
           </View>
 
           <View style={styles.pickerActionRow}>
-            <TouchableOpacity style={styles.pickerBtnCancel} onPress={onClose}>
-              <Text style={styles.pickerBtnCancelText}>Cancel</Text>
+            <TouchableOpacity style={[styles.pickerBtnCancel, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onClose}>
+              <Text style={[styles.pickerBtnCancelText, { color: colors.textMuted }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.pickerBtnSave}
+              style={[styles.pickerBtnSave, { backgroundColor: colors.primaryDark }]}
               onPress={() => onSave(`${tempHour}:${tempMinute}`)}
             >
               <Text style={styles.pickerBtnSaveText}>Save</Text>
@@ -129,7 +138,6 @@ const styles = StyleSheet.create({
   },
   pickerBox: {
     width: "80%",
-    backgroundColor: Colors.white,
     borderRadius: 20,
     padding: 24,
     alignItems: "center",
@@ -138,29 +146,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 20,
-    color: Colors.text,
   },
   pickerRow: { flexDirection: "row", alignItems: "center", height: 200 },
   pickerColumn: { flex: 1, alignItems: "center" },
   pickerColumnLabel: {
     fontSize: 12,
-    color: Colors.grey,
     marginBottom: 8,
     fontWeight: "600",
   },
   pickerScroll: { width: "100%" },
   pickerItem: { paddingVertical: 12, alignItems: "center", borderRadius: 8 },
-  pickerItemActive: { backgroundColor: Colors.lightBlue },
-  pickerItemText: { fontSize: 20, color: Colors.grey, fontWeight: "500" },
-  pickerItemTextActive: {
-    color: Colors.primaryDark,
-    fontWeight: "700",
-    fontSize: 24,
-  },
+  pickerItemText: { fontSize: 20, fontWeight: "500" },
   pickerColon: {
     fontSize: 28,
     fontWeight: "700",
-    color: Colors.text,
     paddingHorizontal: 16,
     marginTop: 20,
   },
@@ -174,20 +173,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     marginRight: 8,
-    backgroundColor: Colors.white,
     borderRadius: 10,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Colors.greyBorder,
   },
-  pickerBtnCancelText: { color: Colors.grey, fontWeight: "600", fontSize: 16 },
+  pickerBtnCancelText: { fontWeight: "600", fontSize: 16 },
   pickerBtnSave: {
     flex: 1,
     paddingVertical: 14,
     marginLeft: 8,
-    backgroundColor: Colors.primaryDark,
     borderRadius: 10,
     alignItems: "center",
   },
-  pickerBtnSaveText: { color: Colors.white, fontWeight: "600", fontSize: 16 },
+  pickerBtnSaveText: { fontWeight: "600", fontSize: 16 },
 });

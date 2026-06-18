@@ -1,3 +1,4 @@
+import { useAppColors } from '@/lib/theme';
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,7 +12,6 @@ import {
 } from "react-native";
 import BottomNav from "../components/BottomNav";
 import StepBar from "../components/StepBar";
-import Colors from "../constants/colors";
 import { CLUSTERS, ClusterKey } from "../engine/clusters";
 
 export default function CategoryPickerScreen() {
@@ -29,16 +29,18 @@ export default function CategoryPickerScreen() {
     if (key === "calendar") router.push("/pill_sched");
   };
 
+  const colors = useAppColors();
+
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <View style={styles.topSection}>
         <StepBar step={1} total={3} />
-        <Text style={styles.question}>
+        <Text style={[styles.question, { color: colors.text }]}>
           WHERE ARE YOU{"\n"}EXPERIENCING{"\n"}SYMPTOMS?
         </Text>
-        <Text style={styles.instruction}>
+        <Text style={[styles.instruction, { color: colors.text }]}>
           Select the area that best describes where you are feeling discomfort.
         </Text>
       </View>
@@ -53,7 +55,11 @@ export default function CategoryPickerScreen() {
           return (
             <TouchableOpacity
               key={cluster.key}
-              style={[styles.card, isSelected && styles.cardSelected]}
+              style={[
+                styles.card,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+                isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
+              ]}
               onPress={() => handleSelect(cluster.key)}
               activeOpacity={0.75}
             >
@@ -61,7 +67,8 @@ export default function CategoryPickerScreen() {
               <Text
                 style={[
                   styles.cardLabel,
-                  isSelected && styles.cardLabelSelected,
+                  isSelected && { color: colors.white },
+                  { color: isSelected ? colors.white : colors.text },
                 ]}
               >
                 {cluster.label}
@@ -71,14 +78,18 @@ export default function CategoryPickerScreen() {
         })}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
-          style={[styles.continueBtn, !selected && styles.continueBtnDisabled]}
+          style={[
+            styles.continueBtn,
+            { backgroundColor: colors.primary, shadowColor: colors.primary },
+            !selected && styles.continueBtnDisabled,
+          ]}
           onPress={handleContinue}
           activeOpacity={0.85}
           disabled={!selected}
         >
-          <Text style={styles.continueBtnText}>Continue →</Text>
+          <Text style={[styles.continueBtnText, { color: colors.white }]}>Continue →</Text>
         </TouchableOpacity>
       </View>
 
@@ -88,7 +99,7 @@ export default function CategoryPickerScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.white },
+  safe: { flex: 1 },
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 10,
@@ -97,14 +108,12 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 24,
     fontWeight: "900",
-    color: Colors.text,
     lineHeight: 30,
     marginBottom: 6,
     marginTop: 8,
   },
   instruction: {
     fontSize: 13,
-    color: Colors.text,
     lineHeight: 18,
   },
   scroll: { flex: 1, paddingHorizontal: 22, marginTop: 16 },
@@ -117,52 +126,43 @@ const styles = StyleSheet.create({
   card: {
     width: "47%",
     borderWidth: 2,
-    borderColor: Colors.text,
     borderRadius: 16,
     paddingVertical: 24,
     paddingHorizontal: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.white,
     gap: 8,
   },
   cardSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
   cardEmoji: { fontSize: 32 },
   cardLabel: {
     fontSize: 13,
     fontWeight: "800",
-    color: Colors.text,
     textAlign: "center",
   },
-  cardLabelSelected: { color: Colors.white },
+  cardLabelSelected: {},
   footer: {
     paddingHorizontal: 22,
     paddingTop: 10,
     paddingBottom: 10,
-    backgroundColor: Colors.white,
   },
   continueBtn: {
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     paddingVertical: 17,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.28,
     shadowRadius: 8,
     elevation: 5,
   },
   continueBtnDisabled: {
-    backgroundColor: Colors.greyLight,
+    opacity: 0.6,
     shadowOpacity: 0,
     elevation: 0,
   },
   continueBtnText: {
-    color: Colors.white,
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.3,

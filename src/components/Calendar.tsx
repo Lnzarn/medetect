@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
-import Colors from "../constants/colors";
+import { useAppColors } from '@/lib/theme';
+import React, { useMemo, useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const WEEKDAYS_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -21,6 +21,7 @@ export default function CalendarModal({
   selectedDateISO,
   onSelectDate,
 }: Props) {
+  const colors = useAppColors();
   const initialDate = new Date();
   const [calendarYear, setCalendarYear] = useState(initialDate.getFullYear());
   const [calendarMonth, setCalendarMonth] = useState(initialDate.getMonth());
@@ -47,8 +48,8 @@ export default function CalendarModal({
         Math.random() > 0.5
           ? "complete"
           : day % 5 === 0
-          ? "none"
-          : "incomplete";
+            ? "none"
+            : "incomplete";
       cells.push({ isEmpty: false, id: iso, dayNum: day, iso, status });
     }
     while (cells.length < 42) {
@@ -60,30 +61,42 @@ export default function CalendarModal({
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalOverlay}>
-        <View style={styles.modalSheet}>
+        <View style={[styles.modalSheet, { backgroundColor: colors.surface }]}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalSheetTitle}>Select Date</Text>
+            <Text style={[styles.modalSheetTitle, { color: colors.text }]}>Select Date</Text>
             <TouchableOpacity onPress={onClose}>
-              <Text style={{ fontSize: 28, color: Colors.text }}>✕</Text>
+              <Text style={{ fontSize: 28, color: colors.text }}>✕</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.monthNav}>
             <TouchableOpacity
-              onPress={() => setCalendarMonth((m) => (m === 0 ? 11 : m - 1))}
+              onPress={() => setCalendarMonth((m) => {
+                if (m === 0) {
+                  setCalendarYear((y) => y - 1);
+                  return 11;
+                }
+                return m - 1;
+              })}
             >
-              <Text style={styles.monthNavButton}>← Prev</Text>
+              <Text style={[styles.monthNavButton, { color: colors.primaryDark }]}>← Prev</Text>
             </TouchableOpacity>
-            <Text style={styles.monthNavTitle}>
+            <Text style={[styles.monthNavTitle, { color: colors.text }]}>
               {new Date(calendarYear, calendarMonth).toLocaleDateString(
                 "default",
                 { month: "long", year: "numeric" }
               )}
             </Text>
             <TouchableOpacity
-              onPress={() => setCalendarMonth((m) => (m === 11 ? 0 : m + 1))}
+              onPress={() => setCalendarMonth((m) => {
+                if (m === 11) {
+                  setCalendarYear((y) => y + 1);
+                  return 0;
+                }
+                return m + 1;
+              })}
             >
-              <Text style={styles.monthNavButton}>Next →</Text>
+              <Text style={[styles.monthNavButton, { color: colors.primaryDark }]}>Next →</Text>
             </TouchableOpacity>
           </View>
 
@@ -99,8 +112,8 @@ export default function CalendarModal({
                 style={[
                   styles.monthDayCell,
                   !cell.isEmpty &&
-                    cell.id === selectedDateISO &&
-                    styles.monthDayCellSelected,
+                  cell.id === selectedDateISO &&
+                  styles.monthDayCellSelected,
                 ]}
                 onPress={() => {
                   if (!cell.isEmpty) {
@@ -114,7 +127,8 @@ export default function CalendarModal({
                     <Text
                       style={[
                         styles.monthDayCellText,
-                        cell.id === selectedDateISO && { color: Colors.white },
+                        { color: colors.text },
+                        cell.id === selectedDateISO && { color: colors.white },
                       ]}
                     >
                       {cell.dayNum}
@@ -145,7 +159,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: Colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -157,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  modalSheetTitle: { fontSize: 18, fontWeight: "700", color: Colors.text },
+  modalSheetTitle: { fontSize: 18, fontWeight: "700" },
   monthNav: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -167,9 +180,8 @@ const styles = StyleSheet.create({
   monthNavButton: {
     fontSize: 13,
     fontWeight: "600",
-    color: Colors.primaryDark,
   },
-  monthNavTitle: { fontSize: 15, fontWeight: "700", color: Colors.text },
+  monthNavTitle: { fontSize: 15, fontWeight: "700" },
   monthGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -180,7 +192,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     fontWeight: "700",
-    color: Colors.greyLight,
     paddingBottom: 10,
     textTransform: "uppercase",
   },
@@ -192,8 +203,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 6,
   },
-  monthDayCellSelected: { backgroundColor: Colors.primaryDark },
-  monthDayCellText: { fontSize: 14, fontWeight: "600", color: Colors.text },
+  monthDayCellSelected: {},
+  monthDayCellText: { fontSize: 14, fontWeight: "600" },
   dotIndicator: {
     width: 4,
     height: 4,

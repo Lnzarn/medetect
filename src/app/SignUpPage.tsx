@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -12,14 +13,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import sharedStyles from "../constants/sharedStyles";
+import useSharedStyles from "../constants/sharedStyles";
 export default function SignUpScreen() {
   const router = useRouter();
+  const styles = useSharedStyles();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   async function handleSignUp() {
     if (!fullName || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please enter the necessary details.");
@@ -41,24 +44,25 @@ export default function SignUpScreen() {
       setLoading(false);
       return;
     }
+    setLoading(false);
     router.push("/AccountPage");
   }
   return (
-    <SafeAreaView style={sharedStyles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={sharedStyles.keyboardView}
+        style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={sharedStyles.scrollContent}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={sharedStyles.headerTitle}>SIGN UP</Text>
+          <Text style={styles.headerTitle}>SIGN UP</Text>
 
-          <View style={sharedStyles.formContainer}>
-            <Text style={sharedStyles.label}>Full Name</Text>
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Full Name</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder="Juan Dela Cruz"
               placeholderTextColor="#9CA3AF"
               value={fullName}
@@ -66,9 +70,9 @@ export default function SignUpScreen() {
               autoCapitalize="words"
             />
 
-            <Text style={sharedStyles.label}>E-mail</Text>
+            <Text style={styles.label}>E-mail</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder="sample@gmail.com"
               placeholderTextColor="#9CA3AF"
               value={email}
@@ -77,9 +81,9 @@ export default function SignUpScreen() {
               autoCapitalize="none"
             />
 
-            <Text style={sharedStyles.label}>Password</Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder=".........."
               placeholderTextColor="#9CA3AF"
               value={password}
@@ -87,9 +91,9 @@ export default function SignUpScreen() {
               secureTextEntry
             />
 
-            <Text style={sharedStyles.label}>Confirm Password</Text>
+            <Text style={styles.label}>Confirm Password</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder=".........."
               placeholderTextColor="#9CA3AF"
               value={confirmPassword}
@@ -98,21 +102,26 @@ export default function SignUpScreen() {
             />
           </View>
 
-          <View style={sharedStyles.bottomContainer}>
+          <View style={styles.bottomContainer}>
             <TouchableOpacity
-              style={sharedStyles.button}
+              style={styles.button}
               onPress={handleSignUp}
               activeOpacity={0.8}
+              disabled={loading}
             >
-              <Text style={sharedStyles.buttonText}>Sign Up</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Sign Up</Text>
+              )}
             </TouchableOpacity>
 
-            <View style={sharedStyles.footerRow}>
-              <Text style={sharedStyles.footerText}>
+            <View style={styles.footerRow}>
+              <Text style={styles.footerText}>
                 Already have an account?{" "}
               </Text>
               <TouchableOpacity onPress={() => router.push("/LogInPage")}>
-                <Text style={sharedStyles.footerLink}>Log In</Text>
+                <Text style={styles.footerLink}>Log In</Text>
               </TouchableOpacity>
             </View>
           </View>

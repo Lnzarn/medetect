@@ -1,6 +1,7 @@
+import { useAppColors } from "@/lib/theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -13,7 +14,6 @@ import {
     View,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import Colors from "../constants/colors";
 import { CONFIG } from "../lib/config";
 
 interface Hospital {
@@ -71,6 +71,7 @@ export default function MapTab() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const mapViewRef = React.useRef<MapView>(null);
+    const colors = useAppColors();
 
     // Calculate distance between two coordinates (Haversine formula)
     const calculateDistance = (
@@ -93,7 +94,7 @@ export default function MapTab() {
     };
 
     // Get user location and find nearest hospital
-    const getUserLocation = async () => {
+    const getUserLocation = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -150,11 +151,11 @@ export default function MapTab() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [hospitals]);
 
     useEffect(() => {
         getUserLocation();
-    }, []);
+    }, [getUserLocation]);
 
     // Open directions in native maps app
     const openDirections = () => {
@@ -189,10 +190,10 @@ export default function MapTab() {
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
                 <View style={styles.centerContent}>
-                    <ActivityIndicator size="large" color={Colors.primaryDark} />
-                    <Text style={styles.loadingText}>Loading map...</Text>
+                    <ActivityIndicator size="large" color={colors.primaryDark} />
+                    <Text style={[styles.loadingText, { color: colors.text }]}>Loading map...</Text>
                 </View>
             </SafeAreaView>
         );
@@ -200,15 +201,15 @@ export default function MapTab() {
 
     if (error) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
                 <View style={styles.centerContent}>
                     <MaterialCommunityIcons
                         name="alert-circle"
                         size={48}
-                        color={Colors.primaryDark}
+                        color={colors.primaryDark}
                     />
-                    <Text style={styles.errorText}>{error}</Text>
-                    <TouchableOpacity style={styles.retryButton} onPress={getUserLocation}>
+                    <Text style={[styles.errorText, { color: colors.text }]}>{error}</Text>
+                    <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primaryDark }]} onPress={getUserLocation}>
                         <Text style={styles.retryButtonText}>Retry</Text>
                     </TouchableOpacity>
                 </View>
@@ -261,7 +262,7 @@ export default function MapTab() {
 
             {/* Floating action buttons */}
             <TouchableOpacity
-                style={styles.fab}
+                style={[styles.fab, { backgroundColor: colors.primaryDark }]}
                 onPress={focusOnNearest}
                 activeOpacity={0.8}
             >
@@ -277,43 +278,43 @@ export default function MapTab() {
                     >
                         <View style={styles.hospitalHeader}>
                             <View style={styles.hospitalTitleSection}>
-                                <Text style={styles.hospitalName}>{nearestHospital.name}</Text>
-                                <View style={styles.distanceTag}>
+                                <Text style={[styles.hospitalName, { color: colors.text }]}>{nearestHospital.name}</Text>
+                                <View style={[styles.distanceTag, { backgroundColor: colors.primaryLight }]}>
                                     <MaterialCommunityIcons
                                         name="map-marker-distance"
                                         size={14}
-                                        color={Colors.primaryDark}
+                                        color={colors.primaryDark}
                                     />
-                                    <Text style={styles.distanceText}>
+                                    <Text style={[styles.distanceText, { color: colors.primaryDark }]}>
                                         {nearestHospital.distance.toFixed(1)} km
                                     </Text>
                                 </View>
                             </View>
                         </View>
 
-                        <View style={styles.infoDivider} />
+                        <View style={[styles.infoDivider, { backgroundColor: colors.border }]} />
 
                         <View style={styles.infoRow}>
                             <MaterialCommunityIcons
                                 name="map-marker"
                                 size={20}
-                                color={Colors.primaryDark}
+                                color={colors.primaryDark}
                             />
-                            <Text style={styles.addressText}>{nearestHospital.address}</Text>
+                            <Text style={[styles.addressText, { color: colors.text }]}>{nearestHospital.address}</Text>
                         </View>
 
                         <View style={styles.infoRow}>
                             <MaterialCommunityIcons
                                 name="phone"
                                 size={20}
-                                color={Colors.primaryDark}
+                                color={colors.primaryDark}
                             />
-                            <Text style={styles.phoneText}>{nearestHospital.phone}</Text>
+                            <Text style={[styles.phoneText, { color: colors.text }]}>{nearestHospital.phone}</Text>
                         </View>
 
                         <View style={styles.actionButtons}>
                             <TouchableOpacity
-                                style={[styles.actionButton, styles.directionsButton]}
+                                style={[styles.actionButton, { backgroundColor: colors.primary }]}
                                 onPress={openDirections}
                                 activeOpacity={0.8}
                             >
@@ -344,7 +345,6 @@ export default function MapTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.white,
     },
     centerContent: {
         flex: 1,
@@ -357,18 +357,15 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 16,
         fontSize: 16,
-        color: Colors.text,
         fontWeight: "600",
     },
     errorText: {
         marginTop: 16,
         fontSize: 16,
-        color: Colors.text,
         textAlign: "center",
     },
     retryButton: {
         marginTop: 20,
-        backgroundColor: Colors.primaryDark,
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
@@ -385,7 +382,6 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: Colors.primaryDark,
         justifyContent: "center",
         alignItems: "center",
         elevation: 8,
@@ -399,7 +395,6 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: Colors.white,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         maxHeight: "40%",
@@ -425,13 +420,11 @@ const styles = StyleSheet.create({
     hospitalName: {
         fontSize: 18,
         fontWeight: "700",
-        color: Colors.text,
         flex: 1,
     },
     distanceTag: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: Colors.lightBlue,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 12,
@@ -440,12 +433,10 @@ const styles = StyleSheet.create({
     distanceText: {
         fontSize: 12,
         fontWeight: "600",
-        color: Colors.primaryDark,
         marginLeft: 4,
     },
     infoDivider: {
         height: 1,
-        backgroundColor: Colors.greyBorder,
         marginVertical: 12,
     },
     infoRow: {
@@ -455,13 +446,11 @@ const styles = StyleSheet.create({
     },
     addressText: {
         fontSize: 14,
-        color: Colors.text,
         marginLeft: 12,
         flex: 1,
     },
     phoneText: {
         fontSize: 14,
-        color: Colors.text,
         marginLeft: 12,
         flex: 1,
     },
@@ -480,7 +469,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     directionsButton: {
-        backgroundColor: Colors.primaryDark,
+        backgroundColor: "transparent",
     },
     callButton: {
         backgroundColor: "#4CAF50",

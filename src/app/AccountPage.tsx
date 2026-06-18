@@ -1,38 +1,37 @@
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import sharedStyles from "../constants/sharedStyles";
+import useSharedStyles from "../constants/sharedStyles";
 export default function AccountScreen() {
-  const router = useRouter();
+  const styles = useSharedStyles();
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getUser();
+    async function loadUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+      setUserId(user.id);
+      getProfile(user.id);
+    }
+
+    loadUser();
   }, []);
-
-  async function getUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
-    setUserId(user.id);
-    getProfile(user.id);
-  }
 
   async function getProfile(id: string) {
     try {
@@ -76,26 +75,23 @@ export default function AccountScreen() {
       setLoading(false);
     }
   }
-  const handleSave = () => {
-    console.log("Saving account info:", { username });
-  };
 
   return (
-    <SafeAreaView style={sharedStyles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={sharedStyles.keyboardView}
+        style={styles.keyboardView}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={sharedStyles.headerTitle}>ACCOUNT</Text>
+          <Text style={styles.headerTitle}>ACCOUNT</Text>
 
-          <View style={sharedStyles.formContainer}>
-            <Text style={sharedStyles.label}>Username</Text>
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Username</Text>
             <TextInput
-              style={sharedStyles.input}
+              style={styles.input}
               placeholder="username123"
               placeholderTextColor="#9CA3AF"
               value={username}
@@ -105,13 +101,18 @@ export default function AccountScreen() {
             />
           </View>
 
-          <View style={sharedStyles.bottomContainer}>
+          <View style={styles.bottomContainer}>
             <TouchableOpacity
-              style={sharedStyles.button}
+              style={styles.button}
               onPress={updateProfile}
               activeOpacity={0.8}
+              disabled={loading}
             >
-              <Text style={sharedStyles.buttonText}>Save</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Save</Text>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -119,12 +120,3 @@ export default function AccountScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 80,
-  },
-});

@@ -1,6 +1,6 @@
+import { useAppColors } from '@/lib/theme';
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Colors from "../constants/colors";
+import { StyleSheet, Text, View } from "react-native";
 
 type Props = {
   taken: number;
@@ -9,12 +9,13 @@ type Props = {
 };
 
 export default function ProgressMetrics({ taken, total, percentage }: Props) {
+  const colors = useAppColors();
   return (
-    <View style={styles.metricsBox}>
+    <View style={[styles.metricsBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.metricsHeader}>
         <Text style={styles.metricsTitle}>Progress Metrics</Text>
-        <View style={styles.metricsPill}>
-          <Text style={styles.metricsPillText}>
+        <View style={[styles.metricsPill, { backgroundColor: colors.elementBg }]}>
+          <Text style={[styles.metricsPillText, { color: colors.primaryDark }]}>
             {`${taken}/${total} Taken`}
           </Text>
         </View>
@@ -28,12 +29,10 @@ export default function ProgressMetrics({ taken, total, percentage }: Props) {
 
 const styles = StyleSheet.create({
   metricsBox: {
-    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: Colors.greyBorder,
   },
   metricsHeader: {
     flexDirection: "row",
@@ -41,9 +40,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  metricsTitle: { fontSize: 15, fontWeight: "700", color: Colors.text },
+  metricsTitle: { fontSize: 15, fontWeight: "700" },
   metricsPill: {
-    backgroundColor: Colors.lightBlue,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -51,18 +49,15 @@ const styles = StyleSheet.create({
   metricsPillText: {
     fontSize: 12,
     fontWeight: "700",
-    color: Colors.primaryDark,
   },
   progressBarTrack: {
     width: "100%",
     height: 6,
-    backgroundColor: Colors.greyTrack,
     borderRadius: 3,
     overflow: "hidden",
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: Colors.primaryDark,
     borderRadius: 3,
   },
 });

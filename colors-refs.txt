@@ -1,0 +1,293 @@
+﻿
+src\app\index.tsx:39:    <SafeAreaView style={[styles.safe, { backgroundColor: 
+colors.background }]}>
+src\app\index.tsx:40:      <StatusBar barStyle={colors.text === '#FFFFFF' ? 
+'light-content' : 'dark-content'} backgroundColor={colors.background} />
+src\app\index.tsx:53:            <Text style={[styles.brandMe, { color: 
+colors.primary }]}>me</Text>
+src\app\index.tsx:54:            <Text style={[styles.brandDetect, { color: 
+colors.text }]}>detect</Text>
+src\app\index.tsx:98:  safe: { flex: 1, backgroundColor: Colors.white },
+src\app\index.tsx:111:  brandMe: { color: Colors.primary, fontWeight: "900" },
+src\app\index.tsx:112:  brandDetect: { color: Colors.grey, fontWeight: "900" },
+src\app\index.tsx:119:    color: Colors.grey,
+src\app\index.tsx:126:    color: Colors.text,
+src\app\index.tsx:133:    color: Colors.grey,
+src\app\index.tsx:147:    backgroundColor: Colors.primary,
+src\app\index.tsx:151:    shadowColor: Colors.primary,
+src\app\index.tsx:158:  playIcon: { fontSize: 25, color: Colors.white },
+src\app\index.tsx:160:    color: Colors.white,
+src\app\map.tsx:194:                    <ActivityIndicator size="large" 
+color={Colors.primaryDark} />
+src\app\map.tsx:208:                        color={Colors.primaryDark}
+src\app\map.tsx:285:                                        
+color={Colors.primaryDark}
+src\app\map.tsx:300:                                color={Colors.primaryDark}
+src\app\map.tsx:309:                                color={Colors.primaryDark}
+src\app\map.tsx:347:        backgroundColor: Colors.white,
+src\app\map.tsx:360:        color: Colors.text,
+src\app\map.tsx:366:        color: Colors.text,
+src\app\map.tsx:371:        backgroundColor: Colors.primaryDark,
+src\app\map.tsx:388:        backgroundColor: Colors.primaryDark,
+src\app\map.tsx:402:        backgroundColor: Colors.white,
+src\app\map.tsx:428:        color: Colors.text,
+src\app\map.tsx:434:        backgroundColor: Colors.lightBlue,
+src\app\map.tsx:443:        color: Colors.primaryDark,
+src\app\map.tsx:448:        backgroundColor: Colors.greyBorder,
+src\app\map.tsx:458:        color: Colors.text,
+src\app\map.tsx:464:        color: Colors.text,
+src\app\map.tsx:483:        backgroundColor: Colors.primaryDark,
+src\app\page1.tsx:36:    <SafeAreaView style={[styles.safe, { backgroundColor: 
+colors.background }]}>
+src\app\page1.tsx:37:      <StatusBar barStyle={colors.text === '#FFFFFF' ? 
+'light-content' : 'dark-content'} backgroundColor={colors.background} />
+src\app\page1.tsx:41:        <Text style={[styles.question, { color: 
+colors.text }]}>
+src\app\page1.tsx:44:        <Text style={[styles.instruction, { color: 
+colors.text }]}>
+src\app\page1.tsx:61:                { borderColor: colors.border, 
+backgroundColor: colors.surface },
+src\app\page1.tsx:62:                isSelected && { backgroundColor: 
+colors.primary, borderColor: colors.primary },
+src\app\page1.tsx:71:                  isSelected && { color: colors.white },
+src\app\page1.tsx:72:                  { color: isSelected ? colors.white : 
+colors.text },
+src\app\page1.tsx:82:      <View style={[styles.footer, { backgroundColor: 
+colors.surface }]}> 
+src\app\page1.tsx:86:            { backgroundColor: colors.primary, 
+shadowColor: colors.primary },
+src\app\page1.tsx:93:          <Text style={[styles.continueBtnText, { color: 
+colors.white }]}>Continue →</Text>
+src\app\page1.tsx:167:    color: Colors.white,
+src\app\page2.tsx:86:      <SafeAreaView style={[styles.loadingScreen, { 
+backgroundColor: colors.background }]}> 
+src\app\page2.tsx:93:    <SafeAreaView style={[styles.safe, { backgroundColor: 
+colors.background }]}> 
+src\app\page2.tsx:94:      <StatusBar barStyle={colors.text === '#FFFFFF' ? 
+'light-content' : 'dark-content'} backgroundColor={colors.background} />
+src\app\page2.tsx:98:        <Text style={[styles.title, { color: colors.text 
+}]}>FOLLOW-UP{"\n"}QUESTIONS</Text>
+src\app\page2.tsx:110:              <Text style={[styles.questionEyebrow, { 
+color: colors.primary }]}> 
+src\app\page2.tsx:113:              <Text style={[styles.questionText, { 
+color: colors.text }]}>{questionText}</Text>
+src\app\page2.tsx:121:                    backgroundColor: colors.surface,
+src\app\page2.tsx:122:                    borderColor: colors.primary,
+src\app\page2.tsx:125:                    backgroundColor: colors.primary,
+src\app\page2.tsx:126:                    borderColor: colors.primary,
+src\app\page2.tsx:148:                    backgroundColor: colors.surface,
+src\app\page2.tsx:149:                    borderColor: colors.border,
+src\app\page2.tsx:152:                    backgroundColor: colors.elementBg,
+src\app\page2.tsx:153:                    borderColor: colors.border,
+src\app\page2.tsx:175:                    backgroundColor: colors.surface,
+src\app\page2.tsx:176:                    borderColor: colors.text,
+src\app\page2.tsx:179:                    backgroundColor: colors.text,
+src\app\page2.tsx:180:                    borderColor: colors.text,
+src\app\page2.tsx:202:      <View style={[styles.footer, { backgroundColor: 
+colors.surface }]}> 
+src\app\page2.tsx:206:            { backgroundColor: colors.primary, 
+shadowColor: colors.primary },
+src\app\pill_sched.tsx:164:                    <Text style={{ fontSize: 28, 
+color: Colors.text }}>✕</Text>
+src\app\pill_sched.tsx:178:                    
+placeholderTextColor={Colors.greyLight}
+src\app\pill_sched.tsx:187:                    
+placeholderTextColor={Colors.greyLight}
+src\app\pill_sched.tsx:203:                    <Text style={{ fontSize: 18, 
+fontWeight: "600", color: Colors.text }}>
+src\app\pill_sched.tsx:231:    backgroundColor: Colors.white,
+src\app\pill_sched.tsx:233:    borderBottomColor: Colors.greyBorder,
+src\app\pill_sched.tsx:237:  headerTitle: { fontSize: 18, fontWeight: "700", 
+color: Colors.text },
+src\app\pill_sched.tsx:238:  headerDateText: { fontSize: 12, color: 
+Colors.grey, marginTop: 8 },
+src\app\pill_sched.tsx:243:    color: Colors.grey,
+src\app\pill_sched.tsx:251:    color: Colors.greyLight,
+src\app\pill_sched.tsx:262:    backgroundColor: Colors.primaryDark,
+src\app\pill_sched.tsx:267:  fabText: { fontSize: 28, color: Colors.white, 
+fontWeight: "300" },
+src\app\pill_sched.tsx:275:    backgroundColor: Colors.white,
+src\app\pill_sched.tsx:286:    backgroundColor: Colors.white,
+src\app\pill_sched.tsx:298:  modalSheetTitle: { fontSize: 18, fontWeight: 
+"700", color: Colors.text },
+src\app\results.tsx:75:            <SafeAreaView style={[styles.safe, { 
+backgroundColor: colors.background }]}>
+src\app\results.tsx:77:                    <Text style={[styles.errorText, { 
+color: colors.text }]}>No results found.</Text>
+src\app\results.tsx:79:                        <Text style={[styles.retryText, 
+{ color: colors.primary }]}>Start Over</Text>
+src\app\results.tsx:92:        <SafeAreaView style={[styles.safe, { 
+backgroundColor: colors.background }]}>
+src\app\results.tsx:93:            <StatusBar barStyle={colors.text === 
+'#FFFFFF' ? 'light-content' : 'dark-content'} 
+backgroundColor={colors.background} />
+src\app\results.tsx:97:                <Text style={[styles.title, { color: 
+colors.text }]}>ASSESSMENT{"\n"}COMPLETE</Text>
+src\app\results.tsx:98:                <Text style={[styles.subtitle, { color: 
+colors.text }]}>
+src\app\results.tsx:120:                <View style={[styles.severityCard, { 
+borderColor: severity.color, backgroundColor: colors.elementBg }]}>
+src\app\results.tsx:126:                <Text style={[styles.sectionTitle, { 
+color: colors.text }]}>POSSIBLE CONDITIONS</Text>
+src\app\results.tsx:127:                <Text style={[styles.disclaimer, { 
+color: colors.textMuted }]}>
+src\app\results.tsx:133:                    <Text style={{ color: 
+colors.textMuted, marginVertical: 8 }}>No conditions meet the selected 
+confidence threshold.</Text>
+src\app\results.tsx:137:                    <View key={match.disease} 
+style={[styles.conditionCard, { borderColor: colors.textMuted }]}>
+src\app\results.tsx:139:                            <View 
+style={[styles.rankBadge, { backgroundColor: colors.primary }]}>
+src\app\results.tsx:140:                                <Text 
+style={[styles.rankText, { color: colors.white }]}>#{index + 1}</Text>
+src\app\results.tsx:142:                            <Text 
+style={[styles.diseaseName, { color: colors.text }]}>{match.disease}</Text>
+src\app\results.tsx:143:                            <Text 
+style={[styles.matchPercentage, { color: colors.primary }]}>
+src\app\results.tsx:156:                                            index === 
+0 ? colors.primary : Colors.greyLight,
+src\app\results.tsx:169:                        style={[styles.clinicBtn, { 
+backgroundColor: colors.primary, shadowColor: colors.primary }]}
+src\app\results.tsx:173:                        <Text 
+style={[styles.clinicBtnText, { color: colors.white }]}>📍 Find Nearest 
+Clinic</Text>
+src\app\results.tsx:182:                    <Text style={[styles.retryBtnText, 
+{ color: colors.white }]}>Start New Assessment</Text>
+src\app\ScreenLayout.tsx:45:      <StatusBar barStyle={colors.text === 
+'#FFFFFF' ? 'light-content' : 'dark-content'} 
+backgroundColor={colors.background} />
+src\app\ScreenLayout.tsx:49:        <View style={[styles.topSection, { 
+backgroundColor: colors.background }]}> 
+src\app\ScreenLayout.tsx:51:          {title && <Text style={[styles.question, 
+{ color: colors.text }]}>{title}</Text>}
+src\app\ScreenLayout.tsx:52:          {subtitle && <Text 
+style={[styles.instruction, { color: colors.text }]}>{subtitle}</Text>}
+src\app\ScreenLayout.tsx:61:        <View style={[styles.footer, { 
+backgroundColor: colors.background }]}> 
+src\app\ScreenLayout.tsx:65:              { backgroundColor: colors.primary, 
+shadowColor: colors.primary },
+src\app\ScreenLayout.tsx:74:            <Text style={[styles.continueBtnText, 
+{ color: colors.white }]}>{continueText}</Text>
+src\app\Settings.tsx:134:        <SafeAreaView style={[styles.safeArea, { 
+backgroundColor: colors.background }]}> 
+src\app\Settings.tsx:135:            <ScrollView 
+contentContainerStyle={[styles.content, { backgroundColor: colors.background 
+}]} showsVerticalScrollIndicator={false}>
+src\app\Settings.tsx:136:                <Text style={[styles.headerTitle, { 
+color: colors.text }]}>SETTINGS</Text>
+src\app\Settings.tsx:192:                                <ActivityIndicator 
+color={colors.white} />
+src\app\Settings.tsx:198:                        <Text 
+style={[styles.lastSyncText, { color: colors.textMuted }]}>Last sync: 
+{lastSynced ? new Date(lastSynced).toLocaleString() : 'Never'}</Text>
+src\app\Settings.tsx:275:        backgroundColor: Colors.primary,
+src\app\Settings.tsx:276:        borderColor: Colors.primary,
+src\app\Settings.tsx:282:        backgroundColor: Colors.primary,
+src\app\Settings.tsx:294:        color: Colors.white,
+src\components\BottomNav.tsx:72:        { paddingBottom: 
+Math.max(insets.bottom, 8), backgroundColor: colors.navBg },
+src\components\BottomNav.tsx:87:              <Text 
+style={[styles.centerLabel, activeTab === tab.key && styles.centerActiveLabel, 
+{ color: colors.white }]}>
+src\components\BottomNav.tsx:108:                    { tintColor: colors.white 
+},
+src\components\BottomNav.tsx:118:                  { color: activeTab === 
+tab.key ? colors.white : 'rgba(255,255,255,0.75)' },
+src\components\Calendar.tsx:64:        <View style={[styles.modalSheet, { 
+backgroundColor: colors.surface }]}> 
+src\components\Calendar.tsx:68:              <Text style={{ fontSize: 28, 
+color: Colors.text }}>✕</Text>
+src\components\Calendar.tsx:76:              <Text 
+style={[styles.monthNavButton, { color: colors.primaryDark }]}>← Prev</Text>
+src\components\Calendar.tsx:78:            <Text style={[styles.monthNavTitle, 
+{ color: colors.text }]}> 
+src\components\Calendar.tsx:87:              <Text 
+style={[styles.monthNavButton, { color: colors.primaryDark }]}>Next →</Text>
+src\components\Calendar.tsx:118:                        { color: colors.text },
+src\components\Calendar.tsx:119:                        cell.id === 
+selectedDateISO && { color: colors.white },
+src\components\MedicationCard.tsx:23:      { backgroundColor: colors.surface, 
+borderColor: colors.border },
+src\components\MedicationCard.tsx:24:      item.taken && { backgroundColor: 
+colors.elementBg, borderColor: colors.border },
+src\components\MedicationCard.tsx:28:          <Text style={[styles.pillName, 
+item.taken && styles.pillNameTaken, { color: item.taken ? colors.textMuted : 
+colors.text }]}>
+src\components\MedicationCard.tsx:31:          <Text style={[styles.pillInfo, 
+{ color: colors.textMuted }]}>{item.info}</Text>
+src\components\MedicationCard.tsx:32:          <Text style={[styles.pillTime, 
+{ color: colors.primaryDark }]}>🕒 {item.time}</Text>
+src\components\MedicationCard.tsx:36:        <View style={[styles.btnAction, 
+styles.btnTaken, { backgroundColor: colors.background }]}> 
+src\components\MedicationCard.tsx:37:          <Text 
+style={[styles.btnTakenText, { color: colors.primary }]}>✓ Taken</Text>
+src\components\MedicationCard.tsx:41:          style={[styles.btnAction, 
+styles.btnTake, { backgroundColor: colors.primaryDark }]}
+src\components\MedicationCard.tsx:44:          <Text 
+style={[styles.btnTakeText, { color: colors.white }]}>Take</Text>
+src\components\MedicationCard.tsx:53:    backgroundColor: Colors.white,
+src\components\MedicationCard.tsx:61:    borderColor: Colors.greyBorder,
+src\components\MedicationCard.tsx:64:  pillCardTaken: { backgroundColor: 
+Colors.white, borderColor: Colors.greyTrack },
+src\components\MedicationCard.tsx:66:  pillName: { fontSize: 18, fontWeight: 
+"600", color: Colors.text, marginBottom: 4 },
+src\components\MedicationCard.tsx:67:  pillNameTaken: { color: Colors.grey, 
+textDecorationLine: "line-through" },
+src\components\MedicationCard.tsx:68:  pillInfo: { fontSize: 15, color: 
+Colors.grey },
+src\components\MedicationCard.tsx:69:  pillTime: { fontSize: 13, color: 
+Colors.primaryDark, fontWeight: "500", marginTop: 4 },
+src\components\MedicationCard.tsx:71:  btnTake: { backgroundColor: 
+Colors.primaryDark },
+src\components\MedicationCard.tsx:72:  btnTakeText: { color: Colors.white, 
+fontSize: 15, fontWeight: "600" },
+src\components\PillProgress.tsx:14:    <View style={[styles.metricsBox, { 
+backgroundColor: colors.surface, borderColor: colors.border }]}> 
+src\components\PillProgress.tsx:17:        <View style={[styles.metricsPill, { 
+backgroundColor: colors.elementBg }]}> 
+src\components\PillProgress.tsx:18:          <Text 
+style={[styles.metricsPillText, { color: colors.primaryDark }]}> 
+src\components\StepBar.tsx:15:      <Text style={[styles.stepLabel, { color: 
+colors.textMuted }]}>
+src\components\StepBar.tsx:18:      <View style={[styles.stepTrack, { 
+backgroundColor: colors.border }]}> 
+src\components\StepBar.tsx:19:        <View style={[styles.stepFill, { width: 
+`${pct}%`, backgroundColor: colors.primary }]} />
+src\components\TimePicker.tsx:132:    backgroundColor: Colors.white,
+src\components\TimePicker.tsx:141:    color: Colors.text,
+src\components\TimePicker.tsx:147:    color: Colors.grey,
+src\components\TimePicker.tsx:153:  pickerItemActive: { backgroundColor: 
+Colors.lightBlue },
+src\components\TimePicker.tsx:154:  pickerItemText: { fontSize: 20, color: 
+Colors.grey, fontWeight: "500" },
+src\components\TimePicker.tsx:156:    color: Colors.primaryDark,
+src\components\TimePicker.tsx:163:    color: Colors.text,
+src\components\TimePicker.tsx:177:    backgroundColor: Colors.white,
+src\components\TimePicker.tsx:181:    borderColor: Colors.greyBorder,
+src\components\TimePicker.tsx:183:  pickerBtnCancelText: { color: Colors.grey, 
+fontWeight: "600", fontSize: 16 },
+src\components\TimePicker.tsx:188:    backgroundColor: Colors.primaryDark,
+src\components\TimePicker.tsx:192:  pickerBtnSaveText: { color: Colors.white, 
+fontWeight: "600", fontSize: 16 },
+src\constants\sharedStyles.ts:10:      backgroundColor: colors.background,
+src\constants\sharedStyles.ts:24:      color: colors.text,
+src\constants\sharedStyles.ts:35:      color: colors.text,
+src\constants\sharedStyles.ts:40:      borderColor: colors.border,
+src\constants\sharedStyles.ts:45:      color: colors.text,
+src\constants\sharedStyles.ts:47:      backgroundColor: colors.elementBg,
+src\constants\sharedStyles.ts:54:      backgroundColor: colors.primaryDark,
+src\constants\sharedStyles.ts:61:      shadowColor: colors.black,
+src\constants\sharedStyles.ts:68:      color: colors.white,
+src\constants\sharedStyles.ts:78:      color: colors.textMuted,
+src\constants\sharedStyles.ts:82:      color: colors.primaryDark,
+src\lib\theme.tsx:12:        text: BaseColors.text,
+src\lib\theme.tsx:14:        navBg: BaseColors.primary,
+src\lib\theme.tsx:15:        primary: BaseColors.primary,
+src\lib\theme.tsx:16:        primaryDark: BaseColors.primaryDark,
+src\lib\theme.tsx:17:        primaryLight: BaseColors.primaryLight,
+src\lib\theme.tsx:28:        navBg: BaseColors.primaryDark,
+src\lib\theme.tsx:29:        primary: BaseColors.primaryLight,
+src\lib\theme.tsx:30:        primaryDark: BaseColors.primary,
+src\lib\theme.tsx:86:    return isDark ? AppColors.dark : AppColors.light;
+
+

@@ -1,9 +1,8 @@
-import Loading from "@/components/Loading";
-import { forceSync, getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
+import { getAllDiseases, getSymptomsForDisease } from "@/lib/sync";
+import { useAppColors } from '@/lib/theme';
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
-  Button,
   Dimensions,
   Image,
   Platform,
@@ -12,15 +11,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import Colors from "../constants/colors";
 
 const { width: SW } = Dimensions.get("window");
 
 export default function WelcomeScreen() {
-  const [syncing, setSyncing] = useState(false);
   const router = useRouter();
+  const colors = useAppColors();
 
   useEffect(() => {
     async function testSync() {
@@ -33,25 +31,10 @@ export default function WelcomeScreen() {
     testSync();
   }, []);
 
-  const handleSync = async () => {
-    if (syncing) return;
-
-    try {
-      setSyncing(true);
-
-      console.log("Starting sync...");
-      await forceSync();
-
-      console.log("Sync complete.");
-    } catch (error) {
-      console.error("Sync failed:", error);
-    } finally {
-      setSyncing(false);
-    }
-  };
+  // sync handled from Settings now
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <View style={styles.container}>
         <View style={styles.logoWrap}>
@@ -64,8 +47,8 @@ export default function WelcomeScreen() {
 
         <View>
           <Text style={styles.brandText}>
-            <Text style={styles.brandMe}>me</Text>
-            <Text style={styles.brandDetect}>detect</Text>
+            <Text style={[styles.brandMe, { color: colors.primary }]}>me</Text>
+            <Text style={[styles.brandDetect, { color: colors.text }]}>detect</Text>
           </Text>
         </View>
 
@@ -81,12 +64,12 @@ export default function WelcomeScreen() {
 
       <View style={styles.btnWrap}>
         <TouchableOpacity
-          style={styles.startBtn}
+          style={[styles.startBtn, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
           onPress={() => router.push("/page1")}
           activeOpacity={0.85}
         >
-          <Text style={styles.playIcon}>▶</Text>
-          <Text style={styles.startBtnText}>Start Session</Text>
+          <Text style={[styles.playIcon, { color: colors.white }]}>▶</Text>
+          <Text style={[styles.startBtnText, { color: colors.white }]}>Start Session</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -97,24 +80,13 @@ export default function WelcomeScreen() {
           <Text style={styles.playIcon}>▶</Text>
           <Text style={styles.startBtnText}>Log In</Text>
         </TouchableOpacity>
-        <Button
-          title={syncing ? "Syncing.." : "Sync"}
-          onPress={handleSync}
-          disabled={syncing}
-        />
       </View>
-
-      {syncing && (
-        <View style={styles.loadingOverlay}>
-          <Loading message="Updating disease database..." />
-        </View>
-      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.white },
+  safe: { flex: 1 },
 
   container: {
     flex: 1,
@@ -127,29 +99,26 @@ const styles = StyleSheet.create({
   logoImage: { width: 180, height: 180 },
 
   brandText: { fontSize: 38, letterSpacing: 1 },
-  brandMe: { color: Colors.primary, fontWeight: "900" },
-  brandDetect: { color: Colors.grey, fontWeight: "900" },
+  brandMe: { fontWeight: "900" },
+  brandDetect: { fontWeight: "900" },
 
   taglineBlock: { alignItems: "center" },
   companyName: {
     fontSize: 11,
     fontWeight: "600",
     letterSpacing: 2.5,
-    color: Colors.grey,
     marginBottom: 10,
     textAlign: "center",
   },
   headline: {
     fontSize: 34,
     fontWeight: "900",
-    color: Colors.text,
     textAlign: "center",
     lineHeight: 40,
     marginBottom: 14,
   },
   desc: {
     fontSize: 14,
-    color: Colors.grey,
     textAlign: "center",
     lineHeight: 21,
   },
@@ -163,20 +132,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.primary,
+    backgroundColor: "#1A3F8B",
     borderRadius: 16,
     paddingVertical: 18,
     width: SW - 64,
-    shadowColor: Colors.primary,
+    shadowColor: "#1A3F8B",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
     elevation: 8,
     gap: 8,
   },
-  playIcon: { fontSize: 25, color: Colors.white },
+  playIcon: { fontSize: 25, color: "#FFFFFF" },
   startBtnText: {
-    color: Colors.white,
+    color: "#FFFFFF",
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: 0.4,
