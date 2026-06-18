@@ -1,4 +1,4 @@
-import { useAppColors } from '@/lib/theme';
+import { useAppColors } from "@/lib/theme";
 import React from "react";
 import {
   StatusBar,
@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomNav from "../components/BottomNav";
 import StepBar from "../components/StepBar";
 
-// ─── Main Layout Wrapper ──────────────────────────────────────────────────────
 interface ScreenLayoutProps {
   children: React.ReactNode;
   step?: number;
@@ -42,21 +41,31 @@ export default function ScreenLayout({
 
   return (
     <View style={[styles.safe, { paddingTop: Math.max(insets.top, 20) + 10 }]}>
-      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      <StatusBar
+        barStyle={colors.text === "#FFFFFF" ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
 
-      {/* ── Header Area ── */}
       {(step || title || subtitle) && (
-        <View style={[styles.topSection, { backgroundColor: colors.background }]}>
+        <View
+          style={[styles.topSection, { backgroundColor: colors.background }]}
+        >
           {step && <StepBar step={step} total={totalSteps} />}
-          {title && <Text style={[styles.question, { color: colors.text }]}>{title}</Text>}
-          {subtitle && <Text style={[styles.instruction, { color: colors.text }]}>{subtitle}</Text>}
+          {title && (
+            <Text style={[styles.question, { color: colors.text }]}>
+              {title}
+            </Text>
+          )}
+          {subtitle && (
+            <Text style={[styles.instruction, { color: colors.text }]}>
+              {subtitle}
+            </Text>
+          )}
         </View>
       )}
 
-      {/* ── Main Content Area ── */}
       <View style={styles.contentContainer}>{children}</View>
 
-      {/* ── Footer / Continue Button ── */}
       {showFooter && (
         <View style={[styles.footer, { backgroundColor: colors.background }]}>
           <TouchableOpacity
@@ -71,18 +80,18 @@ export default function ScreenLayout({
             }}
             activeOpacity={0.85}
           >
-            <Text style={[styles.continueBtnText, { color: colors.white }]}>{continueText}</Text>
+            <Text style={[styles.continueBtnText, { color: colors.white }]}>
+              {continueText}
+            </Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* ── Bottom Nav Bar ── */}
       <BottomNav onNavigate={onNavClick} />
     </View>
   );
 }
 
-// ─── StyleSheet ───────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safe: {
     flex: 1,

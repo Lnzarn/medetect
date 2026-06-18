@@ -85,14 +85,8 @@ export default function BottomNav({ onNavigate }: BottomNavProps) {
 
     setActiveTab(key);
 
-    // Perform navigation here (centralized). Also notify parent via
-    // onNavigate for any side-effects; parents should NOT push themselves
-    // to avoid duplicate navigation.
     onNavigate?.(key);
 
-    // Prevent pushing the same route repeatedly — if already on the
-    // target path, do nothing. This avoids stacking duplicate screens
-    // when the user taps the active tab multiple times.
     const path = pathname;
     const target =
       key === "profile"

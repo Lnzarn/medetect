@@ -1,28 +1,26 @@
 import { useAppColors } from "@/lib/theme";
 import React, { useMemo, useState } from "react";
 import {
-    Alert,
-    Keyboard,
-    KeyboardAvoidingView,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Constants & Styles
 import useSharedStyles from "../constants/sharedStyles";
 
-// Components
 import BottomNav from "../components/BottomNav";
 import CalendarModal from "../components/Calendar";
 import MedicationCard, {
-    type MedicationItem,
+  type MedicationItem,
 } from "../components/MedicationCard";
 import ProgressMetrics from "../components/PillProgress";
 import TimePickerModal from "../components/TimePicker";
@@ -52,7 +50,6 @@ export default function PillSched() {
     });
   };
 
-  // State
   const [selectedDateISO, setSelectedDateISO] = useState(
     formatToISO(new Date()),
   );
@@ -61,7 +58,6 @@ export default function PillSched() {
   const [isCalModalVisible, setIsCalModalVisible] = useState(false);
   const [showCustomTimePicker, setShowCustomTimePicker] = useState(false);
 
-  // Form State
   const [medName, setMedName] = useState("");
   const [medInfo, setMedInfo] = useState("");
   const [medTime, setMedTime] = useState("09:00");
@@ -128,7 +124,6 @@ export default function PillSched() {
         )}
       </ScrollView>
 
-      {/* Floating Buttons */}
       <TouchableOpacity
         style={[
           styles.fabCal,
@@ -149,7 +144,6 @@ export default function PillSched() {
 
       <BottomNav />
 
-      {/* Extracted Modals */}
       <CalendarModal
         visible={isCalModalVisible}
         onClose={() => setIsCalModalVisible(false)}
@@ -167,13 +161,8 @@ export default function PillSched() {
         }}
       />
 
-      {/* Add Medication Modal */}
-      {/* Add Medication Modal */}
       <Modal visible={isMedModalVisible} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior="padding" // Use padding for BOTH platforms; it animates smoother for bottom sheets
-          style={{ flex: 1 }}
-        >
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
           <TouchableOpacity
             style={styles.modalOverlay}
             activeOpacity={1}
@@ -195,7 +184,6 @@ export default function PillSched() {
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   keyboardShouldPersistTaps="handled"
-                  // Added paddingBottom here so the button isn't hugging the keyboard
                   contentContainerStyle={{ paddingBottom: 24 }}
                 >
                   <Text style={[sharedStyles.label, { color: colors.text }]}>

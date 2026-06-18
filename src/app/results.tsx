@@ -73,9 +73,7 @@ export default function ResultsScreen() {
     };
   }, []);
 
-  const handleBottomNav = (_key: string) => {
-    // no-op: BottomNav centrally handles routing
-  };
+  const handleBottomNav = (_key: string) => {};
 
   if (!result) {
     return (
@@ -123,7 +121,6 @@ export default function ResultsScreen() {
         </Text>
       </View>
 
-      {/* Emergency Banner */}
       {result.isEmergency && (
         <View style={styles.emergencyBanner}>
           <Text style={styles.emergencyText}>
@@ -137,7 +134,6 @@ export default function ResultsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Severity indicator */}
         <View
           style={[
             styles.severityCard,
@@ -164,9 +160,15 @@ export default function ResultsScreen() {
         )}
 
         {filteredMatches.map((match: DiseaseScore, index: number) => (
-          <View
+          <TouchableOpacity
             key={match.disease}
             style={[styles.conditionCard, { borderColor: colors.textMuted }]}
+            onPress={() =>
+              router.push(
+                `/DiseaseDetail?disease=${encodeURIComponent(match.disease)}`,
+              )
+            }
+            activeOpacity={0.75}
           >
             <View style={styles.cardHeader}>
               <View
@@ -184,7 +186,6 @@ export default function ResultsScreen() {
               </Text>
             </View>
 
-            {/* Confidence bar */}
             <View style={styles.barTrack}>
               <View
                 style={[
@@ -197,12 +198,11 @@ export default function ResultsScreen() {
                 ]}
               />
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
       <View style={styles.footer}>
-        {/* Find clinic — show if moderate or above */}
         {(top?.confidence ?? 0) >= 0.6 && (
           <TouchableOpacity
             style={[

@@ -1,4 +1,3 @@
-import BottomNav from "@/components/BottomNav";
 import { CLUSTERS } from "@/engine/clusters";
 import { getSymptomsForDisease } from "@/lib/sync";
 import { useAppColors } from "@/lib/theme";
@@ -248,8 +247,6 @@ export default function DiseaseDetail() {
           licensed healthcare provider for diagnosis and treatment.
         </Text>
       </ScrollView>
-
-      <BottomNav />
     </SafeAreaView>
   );
 }
